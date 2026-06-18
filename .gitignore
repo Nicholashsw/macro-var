@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+.env
+*.log
+.DS_Store
+data/raw/
+*.xlsm
+*.xlsx
+fred_data/
+outputs/
+*.parquet
