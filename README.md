@@ -1,11 +1,17 @@
-# Macro VAR Research Lab
+# Macro VAR
 
-Three completed studies on US quarterly macro data, one question: what actually forecasts the
-macroeconomy out of sample once leakage, overfitting and multiple comparisons are controlled? The
-answer across 1,000+ specifications, five estimator classes, externally identified shocks, and a
-real-time replication is consistently modest, and the lab reports it that way.
+One question, asked three ways: what forecasts the US macroeconomy out of sample once
+leakage, overfitting and multiple comparisons are controlled? The answer, across 1,000+
+specifications, five estimator classes, constructed and externally identified shocks, and a
+real-time replication, is that nothing reliably beats a univariate autoregression.
 
-Nicholas Hong · Nanyang Technological University
+Nicholas Hong, Nanyang Technological University
+
+**Consolidated paper:** [`papers/consolidated/main.pdf`](papers/consolidated/main.pdf) gives
+the whole argument in one place: Stage 1 asks which specification and estimator, Stage 2
+whether constructed shocks help and whether the densities are calibrated, Stage 3 whether the
+shock idea survives at scale and in real time. The three stage papers below are the working
+papers behind it; their pipelines and results are unchanged.
 
 | Study | Paper | Headline |
 |---|---|---|

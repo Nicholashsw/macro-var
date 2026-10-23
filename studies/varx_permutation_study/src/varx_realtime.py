@@ -27,6 +27,7 @@ Nicholas Hong | Built for educational and research purposes. Not financial advic
 
 import os
 import subprocess
+import time
 import datetime as dt
 import numpy as np
 import pandas as pd
@@ -50,13 +51,35 @@ def _vintage_date(qend, days=VLAG_DAYS):
 
 def fetch_vintage(series, vdate):
     """Levels of `series` as known on `vdate`, cached to disk. Returns an empty
-    Series if that vintage predates the series' real-time record."""
+    Series if that vintage predates the series' real-time record (ALFRED answers
+    404, cached as an empty file). Any other failed response is never cached: it
+    raises, and a cached file that is not ALFRED's CSV raises too."""
     os.makedirs(VDIR, exist_ok=True)
     path = f"{VDIR}/{series}_{vdate}.csv"
     if not os.path.exists(path):
-        subprocess.run(["curl", "-s",
-                        f"https://alfred.stlouisfed.org/graph/alfredgraph.csv?id={series}&vintage_date={vdate}",
-                        "-o", path, "--max-time", "30"], check=True)
+        tmp = path + ".part"
+        for attempt in range(4):                            # ALFRED's 502/504s are usually transient
+            code = subprocess.run(["curl", "-s", "-w", "%{http_code}", "--max-time", "30", "-o", tmp,
+                                   f"https://alfred.stlouisfed.org/graph/alfredgraph.csv?id={series}&vintage_date={vdate}"],
+                                  capture_output=True, text=True).stdout.strip()
+            if code in ("200", "404"):
+                break
+            time.sleep(2 * (attempt + 1))
+        body = open(tmp, "rb").read() if os.path.exists(tmp) else b""
+        if code == "200" and body.startswith(b"observation_date"):
+            os.replace(tmp, path)
+        elif code == "404":
+            open(path, "wb").close()                        # vintage predates the series' record
+            if os.path.exists(tmp):
+                os.remove(tmp)
+        else:
+            if os.path.exists(tmp):
+                os.remove(tmp)
+            raise RuntimeError(f"ALFRED {series} vintage {vdate}: HTTP {code or 'no response'}, nothing cached")
+    with open(path, "rb") as f:
+        head = f.read(16)
+    if head and not head.startswith(b"observation_date"):
+        raise RuntimeError(f"{path} is not an ALFRED CSV (a cached error page?); delete it and re-run")
     try:
         df = pd.read_csv(path, parse_dates=[0], index_col=0)
     except (pd.errors.EmptyDataError, ValueError):
