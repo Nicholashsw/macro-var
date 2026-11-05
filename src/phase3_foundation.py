@@ -169,8 +169,8 @@ if __name__ == "__main__":
                 fc[(name, t, h)] = np.mean([fc[(m, t, h)] for m in members], axis=0)
 
     models = list(dict.fromkeys(k[0] for k in fc))
-    family = lambda m: ("benchmark" if m in ("RW", "AR(BIC)") else "var" if "VAR" in m
-                        else "prophet" if m == "Prophet" else "average" if m.startswith("Avg") else "foundation")
+    family = lambda m: ("benchmark" if m in ("RW", "AR(BIC)") else "average" if m.startswith("Avg")
+                        else "var" if "VAR" in m else "prophet" if m == "Prophet" else "foundation")
     pre = np.array([dates[i] < pd.Timestamp("2020-01-01") for i in origins])
 
     def rel(e, eb, mask=None):

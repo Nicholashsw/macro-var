@@ -14,3 +14,9 @@ xgboost>=2.0            # src/ml.py only
 fredapi>=0.5            # src/fetch_fred.py (keyless public CSV path needs no key)
 requests>=2.31
 jupyter>=1.0            # to open the shipped notebooks
+
+# Phase 3 only (src/phase3_foundation.py): pretrained forecasters, CPU is fine
+torch>=2.5
+timesfm[torch]>=3.0     # TimesFM 2.5 and TimesFM 3
+chronos-forecasting>=2.3
+prophet>=1.1.6
