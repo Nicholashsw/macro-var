@@ -12,11 +12,20 @@ Implements the methodology in var_horserace_methodology.md:
     Model Confidence Set (Hansen-Lunde-Nason) per target + pooled
   - all lag selection done INSIDE each expanding training window (no leakage)
 
+Four specifications share this runner (choose with --spec):
+  base       4 core series in growth rates, 4 candidate blocks, oil exogenous
+  augmented  base + exports, household wealth, house prices and TFP (TFP exogenous)
+  reer_yoy   augmented, with the real exchange rate in YoY % instead of growth
+  allyoy     augmented, with GDP, core PCE and the exchange rate all in YoY %
+
+    python src/var_horserace.py --spec augmented
+
 Data: FRED public no-key CSV endpoint (fetched separately into ./fred_data).
 For research / education. Not investment advice.
 """
 
 import os
+import argparse
 import warnings, io, json
 warnings.filterwarnings("ignore")
 import numpy as np
@@ -35,23 +44,48 @@ OUT  = ROOT / "outputs"
 OUT.mkdir(parents=True, exist_ok=True)
 FIG  = OUT / "figs"; FIG.mkdir(parents=True, exist_ok=True)
 
+SPECS = ("base", "augmented", "reer_yoy", "allyoy")
+_ap = argparse.ArgumentParser(description="Classical-VAR specification horse race.")
+_ap.add_argument("--spec", choices=SPECS, default="base")
+SPEC = _ap.parse_args().spec
+SUFFIX = "" if SPEC == "base" else f"_{SPEC}"   # output file suffix; base keeps the plain names
+
 # ----------------------------------------------------------------------------
 # 1. SERIES MAP  (id -> how to make it stationary)
-#    growth = 400*dlog (annualized %), oilret = 100*dlog (q %), level = as-is
+#    growth = 400*dlog (annualized %), oilret = 100*dlog (q %), yoy = 4-quarter % change,
+#    level = as-is
 # ----------------------------------------------------------------------------
+YOY_SERIES = {"base": set(), "augmented": set(),
+              "reer_yoy": {"FX"}, "allyoy": {"GDP", "INF", "FX"}}[SPEC]
+
 CORE = {
     "GDP":    ("GDPC1",    "growth"),   # real GDP
     "INF":    ("PCEPILFE", "growth"),   # core PCE price index  (CPILFESL is a 1-line swap)
     "POLICY": ("FEDFUNDS", "level"),    # effective fed funds rate
     "FX":     ("RBUSBIS",  "growth"),   # real broad USD (BIS); binds sample to 1994+
 }
-BLOCKS = {                              # candidate shock blocks (one representative each)
-    "INV":    ("GPDIC1",   "growth"),   # real gross private domestic investment
-    "CONS":   ("PCECC96",  "growth"),   # real personal consumption expenditures
-    "OIL":    ("WTISPLC",  "oilret"),   # WTI spot crude   -> a-priori EXOGENOUS candidate
-    "FISCAL": ("GCEC1",    "growth"),   # real govt consumption+investment (CAPB proxy)
-}
-EXOG_BLOCKS = {"OIL"}                   # tested as VARX exogenous (AR-projected OOS)
+CORE = {k: (sid, "yoy" if k in YOY_SERIES else kind) for k, (sid, kind) in CORE.items()}
+
+if SPEC == "base":
+    BLOCKS = {                          # candidate shock blocks (one representative each)
+        "INV":    ("GPDIC1",   "growth"),   # real gross private domestic investment
+        "CONS":   ("PCECC96",  "growth"),   # real personal consumption expenditures
+        "OIL":    ("WTISPLC",  "oilret"),   # WTI spot crude   -> a-priori EXOGENOUS candidate
+        "FISCAL": ("GCEC1",    "growth"),   # real govt consumption+investment (CAPB proxy)
+    }
+    EXOG_BLOCKS = {"OIL"}               # tested as VARX exogenous (AR-projected OOS)
+else:
+    BLOCKS = {
+        "INV":     ("GPDIC1",          "growth"),  # real gross private domestic investment
+        "CONS":    ("PCECC96",         "growth"),  # real personal consumption expenditures
+        "FISCAL":  ("GCEC1",           "growth"),  # real govt consumption+investment (CAPB proxy)
+        "EXPORTS": ("EXPGSC1",         "growth"),  # real exports G&S (foreign-demand proxy; a GDP component)
+        "WEALTH":  ("TNWBSHNO",        "growth"),  # household net worth, Z.1 (nominal; ends 2025Q4 -> binds sample end)
+        "HOUSING": ("USSTHPI",         "growth"),  # FHFA all-transactions house price index
+        "OIL":     ("WTISPLC",         "oilret"),  # WTI spot crude        -> a-priori EXOGENOUS candidate
+        "TFP":     ("FERNALD_TFPUTIL", "level"),   # Fernald util-adj TFP growth (already a rate) -> EXOG supply shock
+    }
+    EXOG_BLOCKS = {"OIL", "TFP"}
 TARGETS = ["GDP", "INF", "POLICY", "FX"]   # always rank on these 4, comparable across specs
 
 H_LIST   = [1, 4]        # forecast horizons (quarters). h=8 is a 1-line addition.
@@ -75,6 +109,7 @@ def transform(level, kind):
     if kind == "level":  return level
     if kind == "growth": return 400.0 * np.log(level).diff()
     if kind == "oilret": return 100.0 * np.log(level).diff()
+    if kind == "yoy":    return 100.0 * (level / level.shift(4) - 1.0)
     raise ValueError(kind)
 
 raw_levels, modeled = {}, {}
@@ -373,6 +408,11 @@ print(tab[["model_id", "var_lag_order", "T_over_params", "stability_pass",
            "mean_relRMSE_h4", "passes_hard_filters"]].to_string(index=False))
 
 eligible = tab[tab["passes_hard_filters"]].copy().sort_values("avg_rank_h1")
+if len(eligible) == 0:
+    # Overlapping 4-quarter changes put MA-type autocorrelation in the residuals, so under
+    # allyoy no spec passes the whiteness test. Rank everything for reporting only.
+    print("\n[note] NO spec passes hard filters. Ranking all specs for reporting only; none are clean.")
+    eligible = tab.sort_values("avg_rank_h1").copy()
 winner = eligible.iloc[0]["model_id"]
 print(f"\n[BASELINE VAR WINNER among eligible] {winner}")
 
@@ -472,7 +512,7 @@ col_order = (["model_id", "endogenous_set", "exogenous_set", "var_lag_order",
              + [f"relRMSE_{t}_h4" for t in TARGETS] + ["mean_relRMSE_h4", "avg_rank_h4"]
              + ["passes_hard_filters"])
 tab_out = tab[[c for c in col_order if c in tab.columns]]
-csv_path = OUT / "var_horserace_results.csv"
+csv_path = OUT / f"var_horserace_results{SUFFIX}.csv"
 tab_out.to_csv(csv_path, index=False)
 print(f"\n[saved] {csv_path}")
 
@@ -506,8 +546,8 @@ fig.suptitle(f"Out-of-sample 1Q forecasts: winner [{winner}] vs RW", fontsize=12
 plt.tight_layout(); plt.savefig(FIG / "winner_forecasts.png", dpi=140, bbox_inches="tight"); plt.close()
 
 for f in ["relrmse_heatmap.png", "winner_forecasts.png"]:
-    (OUT / f).write_bytes((FIG / f).read_bytes())
-print(f"[saved] {OUT/'relrmse_heatmap.png'}\n[saved] {OUT/'winner_forecasts.png'}")
+    (OUT / f.replace(".png", f"{SUFFIX}.png")).write_bytes((FIG / f).read_bytes())
+print(f"[saved] {OUT / f'relrmse_heatmap{SUFFIX}.png'}\n[saved] {OUT / f'winner_forecasts{SUFFIX}.png'}")
 
 # machine-readable summary
 summary = {
@@ -519,6 +559,6 @@ summary = {
     "winner_spec": {"endog": specs[winner]["endog"], "exog": specs[winner]["exog"]},
     "mcs_included_h1": mcs_results,
 }
-(OUT / "var_horserace_summary.json").write_text(json.dumps(summary, indent=2))
-print(f"[saved] {OUT/'var_horserace_summary.json'}")
+(OUT / f"var_horserace_summary{SUFFIX}.json").write_text(json.dumps(summary, indent=2))
+print(f"[saved] {OUT / f'var_horserace_summary{SUFFIX}.json'}")
 print("\nDONE.")

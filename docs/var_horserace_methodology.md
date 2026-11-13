@@ -1,6 +1,6 @@
 # Macro VAR Selection Horse Race — Methodology
 
-A defensible framework for selecting a baseline classical VAR, designed so it can survive scrutiny from a quant boss and later support a fair comparison against BVAR / Ridge / LASSO / ElasticNet / GVAR.
+A defensible framework for selecting a baseline classical VAR, designed to hold up under review and to support a fair comparison against BVAR / Ridge / LASSO / ElasticNet / GVAR.
 
 ---
 

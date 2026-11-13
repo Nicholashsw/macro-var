@@ -29,10 +29,10 @@ tables and figures and can be re-executed.
 ## Study 1 — specification horse race (root)
 
 ```
-src/            forward-selection runners (base, all-YoY, augmented, REER-YoY, gap-vs-level),
-                phase-2 model-class comparison, BVAR (Minnesota + sum-of-coefficients), FAVAR,
-                ML shrinkage models, evaluation (Clark-West, Diebold-Mariano, MCS), figure builder,
-                reproduce.py (single-seed driver that regenerates every number in the paper)
+src/            var_horserace.py (forward-selection runner; --spec base | augmented |
+                reer_yoy | allyoy), var_horserace_gap.py (gap-vs-level), phase2_modelclass.py
+                (OLS, BVAR, Ridge, LASSO, ElasticNet), figure builder, reproduce.py (single-seed
+                driver that regenerates every number in the paper)
 results/        executed outputs for all five specifications + phase 2 + reproduce_results.json
 figs/           relative-RMSE heatmaps, winner forecasts, HP look-ahead, gap-vs-level
 docs/           methodology note
