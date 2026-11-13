@@ -72,6 +72,51 @@ scikit-learn 1.8.0, arch 8.0.0); those exact pins are in `requirements-reference
 `pip install -r requirements-reference.txt` rebuilds the reference environment. `requirements.txt`
 is the loose everyday set.
 
+### Phase 3: do time-series foundation models change the answer?
+
+`src/phase3_foundation.py` puts zero-shot TimesFM 2.5, TimesFM 3 and Chronos-2 (each target
+alone, and with the other core variables plus oil as past covariates) and Prophet on the Phase-2
+sample, targets, horizons and origins, next to AR(BIC), RW, OLS-VAR and BVAR-Tight. Same 55
+expanding-window origins (2011Q4–2025Q2), so every loss vector lines up. Wrappers are in
+`src/foundation.py`; weights download from Hugging Face on first run.
+
+Relative RMSE vs AR(BIC), h = 1 (< 1 beats AR):
+
+| Model | GDP | INF | POLICY | FX | mean h=1 | mean h=4 |
+|---|---|---|---|---|---|---|
+| TimesFM 2.5 | 0.81 | 0.96 | 0.93 | 0.99 | **0.92** | 1.01 |
+| TimesFM 3 + cov | 0.87 | 0.96 | 0.93 | 1.00 | 0.94 | 0.99 |
+| TimesFM 3 | 0.82 | 0.96 | 0.99 | 0.99 | 0.94 | 1.02 |
+| Chronos-2 + cov | 0.82 | 1.00 | 1.00 | 0.99 | 0.95 | 0.99 |
+| Avg: AR, BVAR, FM + cov | 0.86 | 1.00 | 0.97 | 0.98 | 0.95 | **0.98** |
+| Chronos-2 | 1.12 | 0.95 | 0.98 | 0.98 | 1.01 | 1.02 |
+| BVAR-Tight | 0.78 | 1.18 | 1.28 | 1.03 | 1.07 | 1.06 |
+| Prophet | 0.73 | 1.40 | 9.31 | 1.02 | 3.11 | 1.42 |
+
+The foundation models post the best mean scores in the study, and the Phase-1 conclusion
+still stands:
+
+- **None is significant.** No foundation model or average beats AR(BIC) at h = 1 on a
+  Diebold-Mariano test (smallest p = 0.18, Chronos-2 on inflation), and the joint 90% MCS
+  keeps all 13 models for GDP, inflation and the policy rate.
+- **The GDP gain is COVID.** Before 2020 every foundation model is within 4% of AR(BIC) on GDP
+  (0.97–1.04); from 2020 on TimesFM and Chronos-2 + cov score 0.80–0.87 (univariate Chronos-2
+  gets worse, 1.12). Like the shock gain in Study 3, it is a handful of quarters.
+- **Leakage is an upper bound, not a footnote.** All three models were pretrained on public
+  corpora that almost certainly contain these FRED series, and every origin predates their
+  release. No clean out-of-sample window exists yet at quarterly frequency.
+- **Prophet extrapolates trends.** On the Fed funds level it projects every cut or hike forward
+  (relRMSE 9.3).
+
+```
+python src/phase3_foundation.py      # ~10 min on a 2-core CPU; writes outputs/phase3_*
+```
+
+Committed copies: `results/phase3_foundation_results.csv` (every model × target × horizon, with
+DM and the pre-2020 / 2020+ split), `results/phase3_foundation_relrmse_ar.csv`,
+`results/phase3_summary.json`, `figs/phase3_heatmap.png`. The run used a fresh FRED pull
+(panel to 2026Q2), so the AR and VAR rows differ slightly from the Phase-2 reference vintage.
+
 ## Study 2 — BVAR + shocks density study
 
 `studies/bvar_shocks_density/README.md` for the method, results tables (`eval_multi_us.csv`,

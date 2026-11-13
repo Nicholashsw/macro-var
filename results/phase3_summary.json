@@ -1,0 +1,69 @@
+{
+  "sample": "1994-04-01 to 2026-04-01",
+  "n_quarters": 129,
+  "oos_origins": "2011-10-01 to 2025-04-01 (55)",
+  "best_mean_relRMSE_AR_h1": "TimesFM-2.5",
+  "best_mean_relRMSE_AR_h4": "Avg: AR, BVAR, FM + cov",
+  "mcs90_h1": {
+    "GDP": [
+      "AR(BIC)",
+      "Avg: AR, BVAR, FM + cov",
+      "Avg: BVAR + TimesFM-3 cov",
+      "Avg: foundation models",
+      "BVAR-Tight",
+      "Chronos-2",
+      "Chronos-2 + cov",
+      "OLS-VAR",
+      "Prophet",
+      "RW",
+      "TimesFM-2.5",
+      "TimesFM-3",
+      "TimesFM-3 + cov"
+    ],
+    "INF": [
+      "AR(BIC)",
+      "Avg: AR, BVAR, FM + cov",
+      "Avg: BVAR + TimesFM-3 cov",
+      "Avg: foundation models",
+      "BVAR-Tight",
+      "Chronos-2",
+      "Chronos-2 + cov",
+      "OLS-VAR",
+      "Prophet",
+      "RW",
+      "TimesFM-2.5",
+      "TimesFM-3",
+      "TimesFM-3 + cov"
+    ],
+    "POLICY": [
+      "AR(BIC)",
+      "Avg: AR, BVAR, FM + cov",
+      "Avg: BVAR + TimesFM-3 cov",
+      "Avg: foundation models",
+      "BVAR-Tight",
+      "Chronos-2",
+      "Chronos-2 + cov",
+      "OLS-VAR",
+      "Prophet",
+      "RW",
+      "TimesFM-2.5",
+      "TimesFM-3",
+      "TimesFM-3 + cov"
+    ],
+    "FX": [
+      "AR(BIC)",
+      "Avg: AR, BVAR, FM + cov",
+      "Avg: BVAR + TimesFM-3 cov",
+      "Avg: foundation models",
+      "BVAR-Tight",
+      "Chronos-2",
+      "Chronos-2 + cov",
+      "OLS-VAR",
+      "Prophet",
+      "TimesFM-2.5",
+      "TimesFM-3",
+      "TimesFM-3 + cov"
+    ]
+  },
+  "runtime_s": 618
+}
