@@ -72,6 +72,32 @@ scikit-learn 1.8.0, arch 8.0.0); those exact pins are in `requirements-reference
 `pip install -r requirements-reference.txt` rebuilds the reference environment. `requirements.txt`
 is the loose everyday set.
 
+### Cross-check
+
+`src/crosscheck_study1.py` is a separate implementation of the eligible winner and the
+CORE anchor, extended with a Minnesota BVAR in the same loop, unit
+roots, Johansen under three trend cases, full residual diagnostics, IRFs, FEVD,
+historical decomposition and a GLP-style BVAR. Outputs are in `results/crosscheck/`.
+
+- Scored on the paper's window it returns the published numbers to four decimals:
+  0.9679 / 0.8786 for `CORE+OIL(x)` and 1.0431 / 0.9318 for `CORE`, with identical
+  Clark-West statistics. `reproduce.py` scores both horizons on the 54 common origins;
+  `reproduce_results.json` used to report 57 for h=1 and now reports 54. On all 57 h=1
+  origins the winner scores 0.9656.
+- The Minnesota BVAR (lambda 0.1, prior mean 1 on the policy rate's own lag) averages
+  0.901 at h=1 against the OLS VARX's 0.966, mostly from GDP and the policy rate, but no target
+  beats the OLS VARX in a Diebold-Mariano test (p from 0.18 to 0.81). It is worse on
+  inflation.
+- The full-sample VARX(2) is stable (largest root 0.89) but rejects normality and
+  White homoskedasticity, mostly from 2020, and shows lag-1 serial correlation
+  (LM p = 0.034). Johansen finds no cointegration with an intercept (case 3) and one
+  vector with no deterministic terms, so the no-VECM choice depends on the trend case.
+
+`docs/eviews_spotchecks.md` lists EViews commands, with expected values, for checking the
+same model in a second package.
+
+![Cross-check one-step forecasts](figs/crosscheck_oos_h1.png)
+
 ## Study 2 — BVAR + shocks density study
 
 `studies/bvar_shocks_density/README.md` for the method, results tables (`eval_multi_us.csv`,

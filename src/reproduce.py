@@ -220,7 +220,7 @@ print("\n=== PHASE A: baseline specification search ===")
 TARG=["GDP","INF","POLICY","FX"]
 N=len(panelL); i0=int(N*OOS_START_FRAC)
 R["oos"]={"first_origin":str(panelL.index[i0].date()),
-          "n_origins_h1":int(N-1-i0),"n_origins_h4":int(N-4-i0),"start_frac":OOS_START_FRAC,"lag_p":P}
+          "n_origins_h1":int(N-max(H_LIST)-i0),"n_origins_h4":int(N-max(H_LIST)-i0),"start_frac":OOS_START_FRAC,"lag_p":P}
 benchL=make_bench(panelL,TARG,i0)
 
 # Johansen on core levels
