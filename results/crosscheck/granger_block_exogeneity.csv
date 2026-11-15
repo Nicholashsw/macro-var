@@ -1,0 +1,17 @@
+dependent,excluded,chi2,df,p
+gdp,inf,1.9916,2,0.3694
+gdp,policy,3.5752,2,0.1674
+gdp,fx,0.5592,2,0.7561
+gdp,ALL,6.9352,6,0.3269
+inf,gdp,0.9792,2,0.6129
+inf,policy,1.1338,2,0.5673
+inf,fx,5.9869,2,0.0501
+inf,ALL,8.1091,6,0.2302
+policy,gdp,1.3617,2,0.5062
+policy,inf,5.2161,2,0.0737
+policy,fx,6.5402,2,0.038
+policy,ALL,18.4129,6,0.0053
+fx,gdp,6.5607,2,0.0376
+fx,inf,6.0028,2,0.0497
+fx,policy,2.489,2,0.2881
+fx,ALL,12.7525,6,0.0471
