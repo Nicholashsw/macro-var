@@ -9,13 +9,16 @@ Nicholas Hong, Nanyang Technological University
 
 | Study | Paper | Headline |
 |---|---|---|
-| **Disciplined specification search and model-class evaluation** (repository root) | [`papers/01_var_selection_horserace.pdf`](papers/01_var_selection_horserace.pdf) | A theory-pruned block forward search with hard validity gates selects a four-variable core plus oil as the honest baseline; **no estimator — OLS, Minnesota BVAR, ridge, LASSO, elastic-net — is distinguishable from a univariate AR by the Model Confidence Set.** Full-sample HP filtering of the policy rate leaks the future by 66% of the cycle's own standard deviation at the endpoint; year-over-year transforms fail every whiteness test. |
-| **A permutation study of VARX forecasting models** (`studies/varx_permutation_study/`) | [`studies/varx_permutation_study/paper/varx_permutation_study.pdf`](studies/varx_permutation_study/paper/varx_permutation_study.pdf) | 1,632 specification cells / 1,014 unique models in an expanding walk-forward from 2009Q4. Exogenous shocks buy a ~12% GDP RMSE gain at h=1 that is **mostly COVID and mostly noise** (4.0% of specs beat the core at the 5% level, what chance delivers); the gain survives ALFRED real-time vintages; **externally identified shocks (Kaenzig oil, Bauer-Swanson FOMC) do not beat cheap growth-rate proxies**; in the predictive density the shock model is overconfident until future-shock risk is priced, after which it is no sharper than the pure VAR. |
+| **Disciplined specification search and model-class evaluation** (repository root) | [`papers/01_var_selection_horserace.pdf`](papers/01_var_selection_horserace.pdf) | A theory-pruned block forward search with hard validity gates selects a four-variable core plus oil as the honest baseline; **no estimator (OLS, Minnesota BVAR, ridge, LASSO, elastic-net) is distinguishable from a univariate AR by the Model Confidence Set.** Full-sample HP filtering of the policy rate leaks the future: the two-sided cycle differs from the real-time one by 0.86 points on average, 80% of the cycle's own standard deviation. Over the last eight quarters the gap is 65.8%, a figure that moves by tens of points with the quarter the sample ends in (`src/demo_hp_lookahead.py` gives 24% to 62% for end quarters from 2025Q2 to 2026Q2); year-over-year transforms fail every whiteness test. |
+| **A permutation study of VARX forecasting models** (`studies/varx_permutation_study/`) | [`studies/varx_permutation_study/paper/varx_permutation_study.pdf`](studies/varx_permutation_study/paper/varx_permutation_study.pdf) | 1,632 specifications (544 cells under three lag rules) / 1,014 unique models in an expanding walk-forward from 2009Q4. Exogenous shocks buy a ~12% GDP RMSE gain at h=1 that is **mostly COVID and mostly noise** (4.0% of specs beat the core at the 5% level, what chance delivers); the gain survives ALFRED real-time vintages; **externally identified shocks (Kaenzig oil, Bauer-Swanson FOMC) do not beat cheap growth-rate proxies**; in the predictive density the shock model is overconfident until future-shock risk is priced, after which it is no sharper than the pure VAR. |
 
 All data are public and keyless (FRED, FRBSF, NY Fed HLW, ALFRED); each study ships its results
 tables and figures and can be re-executed.
 
 ![Relative RMSE heatmap](figs/relrmse_heatmap.png)
+
+The heatmap is drawn from the 57-origin run in `results/var_horserace_results.csv`, where the
+winner scores 0.9657 at h=1. The text below uses the 54 origins common to both horizons (0.9679).
 
 ---
 
@@ -26,7 +29,8 @@ src/            var_horserace.py (forward-selection runner; --spec base | augmen
                 reer_yoy | allyoy), var_horserace_gap.py (gap-vs-level), phase2_modelclass.py
                 (OLS, BVAR, Ridge, LASSO, ElasticNet), figure builder, reproduce.py (single-seed
                 driver that regenerates every number in the paper)
-results/        executed outputs for all five specifications + phase 2 + reproduce_results.json
+results/        executed outputs for the four specifications, gap-vs-level and phase 2 (an
+                earlier 127-quarter run), plus reproduce_results.json (128 quarters)
 figs/           relative-RMSE heatmaps, winner forecasts, HP look-ahead, gap-vs-level
 docs/           methodology note
 papers/var_selection_horserace/   LaTeX source and figures
@@ -52,14 +56,19 @@ at h=1. Neither wealth specification is admissible: `CORE+WEALTH` fails the pars
 (p = 0.044). The **eligible winner — the specification used throughout the paper — is `CORE+OIL(x)`
 at 0.9679 (h=1) and 0.8786 (h=4)**. The rejected 0.9117 is reported precisely *because* it is the
 best raw score in the run: it is the case that demonstrates the hard filters overruling
-out-of-sample RMSE, which is the point of this study. Full per-specification detail is in
+out-of-sample RMSE, which is the point of this study. The winner is chosen and scored on the same
+out-of-sample window, with the lag length fixed at 2, so 0.9679 is the best eligible score of the
+search and has not been tested on fresh data. Full per-specification detail is in
 `results/reproduce_results.json` (`phaseA_table`).
 
 Re-executed on 2026-08-21 against a fresh FRED pull: the specification search (eligible winner
 `CORE+OIL(x)`, and the same greedy path and gate rejections above) and the model-class table
-reproduce identically; the HP
-revision statistic (66.3% vs 65.8%) and the Johansen trace move in the second decimal because the
-reference run used a frozen 2026-07-10 FRED vintage and later vintages carry data revisions. `results/reproduce_results.json`
+reproduced. The HP revision statistic moved from 65.8% to 66.3% and the Johansen trace in the
+second decimal. The HP move comes from where the sample ends: the federal funds rate is not
+revised, the fresh pull had one more month of data, and the statistic is about five points lower
+when the sample ends one quarter earlier. A rerun on 17 November 2026 from a later cache gives the
+same search result and differs from the model-class table in the fourth decimal on the wide
+models. `results/reproduce_results.json`
 records the library versions of the reference run (numpy 2.4.4, pandas 3.0.2, statsmodels 0.14.6,
 scikit-learn 1.8.0, arch 8.0.0); those exact pins are in `requirements-reference.txt`, so
 `pip install -r requirements-reference.txt` rebuilds the reference environment. `requirements.txt`
@@ -82,7 +91,7 @@ historical decomposition and a GLP-style BVAR. Outputs are in `results/crosschec
   beats the OLS VARX in a Diebold-Mariano test (p from 0.18 to 0.81). It is worse on
   inflation.
 - The full-sample VARX(2) is stable (largest root 0.89) but rejects normality and
-  White homoskedasticity, mostly from 2020, and shows lag-1 serial correlation
+  White homoskedasticity, and shows lag-1 serial correlation
   (LM p = 0.034). Johansen finds no cointegration with an intercept (case 3) and one
   vector with no deterministic terms, so the no-VECM choice depends on the trend case.
 
