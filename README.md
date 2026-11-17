@@ -33,7 +33,7 @@ ships its result tables and figures and can be re-executed.
 
 - Forecasts are made out of sample: at each forecast origin the model is fitted only on data
   available up to that quarter. Accuracy is relative RMSE, a model's typical forecast error
-  divided by the benchmark's, so values below 1 beat the benchmark.
+  divided by that of a random walk (a no-change forecast), so values below 1 beat the random walk.
 - The specification search is greedy and theory-pruned: it adds one variable block at a time and
   keeps the best, but a specification is eligible only if it is stable, has enough observations
   per parameter (the parsimony gate, T/k) and leaves residuals with no remaining
@@ -54,11 +54,11 @@ LASSO, elastic-net) is distinguishable from a univariate AR by the Model Confide
 The greedy forward path, before the validity gates are applied, runs 1.0431 (`CORE`) → 0.9452
 (`CORE+WEALTH`) → 0.9117 (`CORE+WEALTH+OIL(x)`) in mean relative RMSE at h=1. Neither wealth
 specification is admissible: `CORE+WEALTH` fails the parsimony gate (T/k = 2.29) and
-`CORE+WEALTH+OIL(x)` fails both parsimony (T/k = 2.10) and residual whiteness (p = 0.044). The
-eligible winner, used throughout the paper, is `CORE+OIL(x)` at 0.9679 (h=1) and 0.8786 (h=4).
-The rejected 0.9117 is reported because it is the best raw score in the run: it is the case where
-the hard filters overrule out-of-sample RMSE, which is the point of this study. Full
-per-specification detail is in `results/reproduce_results.json` (`phaseA_table`).
+`CORE+WEALTH+OIL(x)` fails parsimony (T/k = 2.10). The eligible winner, used throughout the
+paper, is `CORE+OIL(x)` at 0.9679 (h=1) and 0.8786 (h=4). The rejected 0.9117 is reported
+because it is the best raw score in the run: it is the case where the hard filters overrule
+out-of-sample RMSE, which is the point of this study. Full per-specification detail is in
+`results/reproduce_results.json` (`phaseA_table`).
 
 ![Relative RMSE heatmap](figs/relrmse_heatmap.png)
 
@@ -83,11 +83,12 @@ pure VAR.
 ## What didn't work
 
 - No estimator beats a univariate autoregression: the Model Confidence Set cannot separate them.
-- The winner is chosen and scored on the same out-of-sample window, with the lag length fixed at
-  2, so 0.9679 is the best eligible score of the search and has not been tested on fresh data.
-- The Minnesota BVAR in the cross-check averages 0.901 at h=1 against the OLS VARX's 0.966,
-  mostly from GDP and the policy rate, but no target beats the OLS VARX in a Diebold-Mariano test
-  (p from 0.18 to 0.81). It is worse on inflation.
+- The winner is chosen and scored on the same out-of-sample window, with the lag chosen by BIC (up
+  to 4) in each training window, so 0.9679 is the best eligible score of the search and has not
+  been tested on fresh data.
+- The Minnesota BVAR in the cross-check averages 0.901 at h=1 against the OLS VARX's 0.966 on all
+  57 h=1 origins, mostly from GDP and the policy rate, but no target beats the OLS VARX in a
+  Diebold-Mariano test (p from 0.18 to 0.81). It is worse on inflation.
 - The full-sample VARX(2) is stable (largest root 0.89) but rejects normality and White
   homoskedasticity, and shows lag-1 serial correlation (LM p = 0.034). Johansen finds no
   cointegration with an intercept (case 3) and one vector with no deterministic terms, so the
