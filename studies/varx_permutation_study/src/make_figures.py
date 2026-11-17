@@ -155,6 +155,17 @@ stats["counts"] = {"cells": 544, "spec_rows": int(res.spec_id.nunique()), "uniqu
                    "n_obs": len(df), "sample_start": str(df.index[0].date()), "sample_end": str(df.index[-1].date()), "result_rows": int(len(res))}
 dmsig = V[(V.path == "uncond") & (V["sample"] == "all") & V.dm_p.notna()]
 stats["dm_sig_share_5pct"] = round(float((dmsig.dm_p < 0.05).mean()), 4)
+# DM p-values are two-sided; one-sided "better than the core" = dm_p / 2 with dm_stat < 0 (spec has lower squared error)
+better = (dmsig.dm_p / 2 < 0.05) & (dmsig.dm_stat < 0)
+stats["dm_tests"] = int(len(dmsig))
+stats["dm_n_better_5pct"] = int(better.sum())
+stats["dm_better_share_5pct"] = round(float(better.mean()), 4)
+stats["dm_worse_share_5pct"] = round(float(((dmsig.dm_p < 0.05) & (dmsig.dm_stat > 0)).mean()), 4)
+g1 = V[(V.target == "gdp") & (V.h == 1) & (V.path == "uncond") & (V["sample"] == "all")]
+core1 = g1[(g1.endog == "gdp+inf+stance") & (g1.shocks == "none")].rmse.iloc[0]
+g1 = g1[g1.dm_p.notna()]                    # drops the core itself
+stats["gdp1_vs_core"] = {"n_specs": int(len(g1)), "share_below_core": round(float((g1.rmse < core1).mean()), 4),
+                         "n_sig_better_5pct": int(((g1.dm_p / 2 < 0.05) & (g1.dm_stat < 0)).sum())}
 dmall = VA[(VA.path == "uncond") & (VA["sample"] == "all") & VA.dm_p.notna()]
 stats["dm_sig_share_5pct_by_rule"] = {r: round(float((g.dm_p < 0.05).mean()), 4) for r, g in dmall.groupby("lag_rule")}
 # robustness: best spec per target/horizon under each lag rule

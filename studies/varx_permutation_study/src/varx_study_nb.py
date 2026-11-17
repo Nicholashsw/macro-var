@@ -308,8 +308,8 @@ print(f"RMSE ex COVID: {np.sqrt(np.mean((fc[mask]-act[mask])**2)):.3f}")
 #    Most of the headline gain concentrates in the COVID reversal quarters; the
 #    ex-COVID gain is real but modest.
 # 2. Almost nothing survives a Diebold-Mariano test against the plain core VAR.
-#    About 3.8 percent of specs clear 5 percent significance, which is what noise
-#    alone would deliver. Rank models, but do not oversell the ranking.
+#    Only 2 of 2,826 tests favour adding shocks at 5 percent; most significant
+#    results go the other way. Rank models, but do not oversell the ranking.
 # 3. Do not purge shocks because it feels rigorous. Purging costs forecast accuracy
 #    for GDP, inflation and the dollar. It is the right tool when the question is
 #    structural, and the wrong default when the question is predictive.

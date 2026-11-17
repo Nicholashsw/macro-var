@@ -1,4 +1,5 @@
 import json
+import os
 import time
 import numpy as np
 import pandas as pd
@@ -14,6 +15,17 @@ bench = vl.ar_benchmark(df, ["gdp", "inf", "stance", "fx"], train_end_i, study["
 res = vl.build_results(study, df, bench)
 res["valid"] = vl.validity(res)
 res.to_parquet("results.parquet")
+# hero-chart input: RMSE relative to the core three-variable VAR (the Diebold-Mariano benchmark),
+# GDP h=1, uncond path, full sample, valid BIC specs. dm_p is two-sided, so the one-sided p that
+# a spec is BETTER than the core is dm_p/2 when dm_stat < 0 (spec has lower squared error), else 1 - dm_p/2.
+hero = res[(res.target == "gdp") & (res.h == 1) & (res.path == "uncond") & (res["sample"] == "all")
+           & res.valid & (res.lag_rule == "bic")].copy()
+core = hero[(hero.endog == "gdp+inf+stance") & (hero.shocks == "none")]
+hero = hero[hero.dm_p.notna()]   # drops the core itself, whose DM p is undefined
+hero["rel_rmse_core_var"] = hero["rmse"] / core["rmse"].iloc[0]
+hero["dm_p_one_sided"] = np.where(hero.dm_stat < 0, hero.dm_p / 2, 1 - hero.dm_p / 2)
+os.makedirs("results", exist_ok=True)
+hero[["spec_id", "rel_rmse_core_var", "dm_p_one_sided"]].round(4).to_csv("results/spec_relrmse_gdp_h1.csv", index=False)
 print("results", res.shape, f"{time.time()-t0:.0f}s")
 
 # quick sanity leaderboard

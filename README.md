@@ -81,8 +81,10 @@ sample ends in. Year-over-year transforms fail every whiteness test.
 
 VARX permutation study. 1,632 specifications (544 cells under three lag rules, BIC the main rule)
 and 1,014 unique models in an expanding walk-forward from 2009Q4. Exogenous shocks buy a 12% GDP
-RMSE gain at h=1 that is mostly COVID and mostly noise (3.8% of BIC specs beat the core at the 5%
-level, what chance delivers). The gain survives ALFRED real-time vintages (16.6% final, 15.8%
+RMSE gain at h=1 (best shocked spec against best pure VAR) that is mostly COVID and mostly noise.
+Two thirds of the shock-augmented models forecast GDP one quarter ahead with lower error than the
+plain core VAR, but none beats it significantly. Across all targets and horizons, only 2 of 2,826
+tests favour adding shocks; most significant results go the other way. The gain survives ALFRED real-time vintages (16.6% final, 15.8%
 real-time). Externally identified shocks (Kaenzig oil,
 Bauer-Swanson FOMC) do not beat cheap growth-rate proxies. In the predictive density the shock
 model is overconfident until future-shock risk is priced, after which it is no sharper than the

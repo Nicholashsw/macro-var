@@ -458,6 +458,15 @@
   "result_rows": 63918
  },
  "dm_sig_share_5pct": 0.0379,
+ "dm_tests": 2826,
+ "dm_n_better_5pct": 2,
+ "dm_better_share_5pct": 0.0007,
+ "dm_worse_share_5pct": 0.0375,
+ "gdp1_vs_core": {
+  "n_specs": 314,
+  "share_below_core": 0.6592,
+  "n_sig_better_5pct": 0
+ },
  "dm_sig_share_5pct_by_rule": {
   "aic": 0.0336,
   "bic": 0.0379,

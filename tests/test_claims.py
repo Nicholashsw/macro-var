@@ -240,6 +240,14 @@ def share():
     return 100 * J(PS)["dm_sig_share_5pct"]
 
 
+def share_below_core():
+    return 100 * J(PS)["gdp1_vs_core"]["share_below_core"]
+
+
+def share_better():
+    return 100 * J(PS)["dm_better_share_5pct"]
+
+
 def rtg(k, s="all", h="1"):
     return J(RT)["gdp"][h][s][k]
 
@@ -334,7 +342,7 @@ def paper_claims(pp, study1, varx):
                                           cell("1{,}632", PS, "counts.spec_rows", jp(PS, "counts.spec_rows")),
                                           cell("1{,}014", PS, "counts.unique_models", jp(PS, "counts.unique_models"))])
             S(pp, r"the best GDP specification cuts", [cell("12", PS, "1-best/noshock gdp_1_all", adv12)])
-            S(pp, r"Fourth, almost nothing is statistically distinguishable: only", [cell("3.8", PS, "dm_sig_share_5pct", share)])
+            S(pp, r"Fourth, almost nothing is statistically distinguishable:", [cell("66", PS, "gdp1_vs_core.share_below_core", share_below_core)], until=r"percent level")
             S(pp, r"survives publication lags and national-accounts revisions almost intact, from", [
                 cell("16.6", RT, "gdp.1.all.adv_final_pct", lambda: rtg("adv_final_pct")),
                 cell("15.8", RT, "gdp.1.all.adv_rt_pct", lambda: rtg("adv_rt_pct"))])
@@ -343,7 +351,7 @@ def paper_claims(pp, study1, varx):
                                      cell("1,632", PS, "counts.spec_rows", jp(PS, "counts.spec_rows")),
                                      cell("1,014", PS, "counts.unique_models", jp(PS, "counts.unique_models"))])
             S(pp, r"In the VARX study, exogenous shocks improve", [cell("12", PS, "1-best/noshock gdp_1_all", adv12)])
-            S(pp, r"Only", [cell("3.8", PS, "dm_sig_share_5pct", share)], after="Residualization is an identification tool")
+            S(pp, r"forecasting tool\.", [cell("66", PS, "gdp1_vs_core.share_below_core", share_below_core)], until=r"percent level")
             S(pp, r"A real-time replication on ALFRED vintages leaves", [cell("16.6", RT, "gdp.1.all.adv_final_pct", lambda: rtg("adv_final_pct")),
                                                                       cell("15.8", RT, "gdp.1.all.adv_rt_pct", lambda: rtg("adv_rt_pct"))])
         S(pp, r"All series are quarterly, 1990Q1 to 2026Q1", [cell("145", PS, "counts.n_obs", jp(PS, "counts.n_obs"))], until=r"\)")
@@ -398,6 +406,12 @@ def paper_claims(pp, study1, varx):
                                                 g(PS, f"gap h{h} {tr}", (lambda h=h, tr=tr: gap(h, tr)))],
               after="Median GDP RMSE by exogenous path assumption")
         S(pp, r"Across all validity-gated specifications, targets, and horizons under BIC", [cell("3.8", PS, "dm_sig_share_5pct", share)])
+        if True:  # both papers restate the DM result one-sided
+            S(pp, r"the worse one: only", [cell("2", PS, "dm_n_better_5pct", jp(PS, "dm_n_better_5pct")),
+                                          cell("2,826", PS, "dm_tests", jp(PS, "dm_tests")),
+                                          cell("0.07", PS, "dm_better_share_5pct", share_better)], until=r"one-sided\.")
+            S(pp, r"For GDP at h=1,", [cell("66", PS, "gdp1_vs_core.share_below_core", share_below_core),
+                                      cell("314", PS, "gdp1_vs_core.n_specs", jp(PS, "gdp1_vs_core.n_specs"))], until=r"significantly\.")
         S(pp, r"rejection p-value is", [cell("0.38", PS, "gdp_1_all.best.dm_p", jp(PS, "gdp_1_all.best.dm_p")),
                                         cell("65", PS, "counts.n_origins", jp(PS, "counts.n_origins"))], until=r"evaluation points")
         S(pp, r"Do not report full-window GDP gains", [cell("0.33", PS, "gdp_1_all.best.r2_oos", jp(PS, "gdp_1_all.best.r2_oos")),
@@ -495,7 +509,9 @@ S(R, r"the two-sided cycle\s+differs", [cell("0.86", RR, "hp.mean_abs_rev", jp(R
 S(R, r"Over the last eight quarters the gap is", [cell("65.8", RR, "hp.pct_of_std", jp(RR, "hp.pct_of_std"))])
 S(R, r"VARX permutation study\.", [cell("1,632", PS, "counts.spec_rows", jp(PS, "counts.spec_rows")), cell("544", PS, "counts.cells", jp(PS, "counts.cells")),
                                    cell("1,014", PS, "counts.unique_models", jp(PS, "counts.unique_models"))], until=r"from 2009Q4")
-S(R, r"Exogenous shocks buy a", [cell("12", PS, "1-best/noshock gdp_1_all", adv12), cell("3.8", PS, "dm_sig_share_5pct", share)], until=r"delivers\)")
+S(R, r"Exogenous shocks buy a", [cell("12", PS, "1-best/noshock gdp_1_all", adv12),
+                                 cell("2", PS, "dm_n_better_5pct", jp(PS, "dm_n_better_5pct")),
+                                 cell("2,826", PS, "dm_tests", jp(PS, "dm_tests"))], until=r"other way\.")
 S(R, r"The gain survives ALFRED", [cell("16.6", RT, "adv_final_pct", lambda: rtg("adv_final_pct")), cell("15.8", RT, "adv_rt_pct", lambda: rtg("adv_rt_pct"))])
 S(R, r"with the lag chosen by BIC \(up", [cell("4", "src/var_horserace.py", "MAXLAG_VAR", lambda: codenum("src/var_horserace.py", r"MAXLAG_VAR = (\d+)")),
                                          cell("0.9679", RR, "mean_h1", A(Q, "mean_h1"))])
@@ -538,7 +554,8 @@ V = "VARX-README"
 S(V, r"the study crosses", [cell("16", VL, "endogenous sets", n_endog), cell("12", VL, "shock subsets", n_shocks)], until=r"shock subsets")
 S(V, r"That is", [cell("1,632", PS, "counts.spec_rows", jp(PS, "counts.spec_rows")), cell("1,014", PS, "counts.unique_models", jp(PS, "counts.unique_models"))], until=r"unique models")
 S(V, r"cuts RMSE about", [cell("12", PS, "1-best/noshock gdp_1_all", adv12)], until=r"percent")
-S(V, r"But only", [cell("3.8", PS, "dm_sig_share_5pct", share)], until=r"percent")
+S(V, r"Across all targets and horizons, only", [cell("2", PS, "dm_n_better_5pct", jp(PS, "dm_n_better_5pct")),
+                                                cell("2,826", PS, "dm_tests", jp(PS, "dm_tests"))], until=r"tests favour")
 S(V, r"best RMSE", [cell("1.62", PS, "best_by_rule.stance_8_aic", jp(PS, "best_by_rule.stance_8_aic")),
                     cell("2.01", PS, "best_by_rule.stance_8_bic", jp(PS, "best_by_rule.stance_8_bic"))], until=r"BIC\)")
 S(V, r"roughly", [cell("45", "src varx_realtime.py", "VLAG_DAYS", lambda: codenum(f"{VARX}/src/varx_realtime.py", r"VLAG_DAYS = (\d+)"))], until=r"days")
@@ -780,3 +797,14 @@ if __name__ == "__main__":
     print(f"\nnumbers covered by a claim row: {tc}; allowlisted: {ta}; uncovered: {sum(len(v[2]) for v in cov.values())}")
     for d, (c_, a_, u_) in cov.items():
         print(f"  {d}: covered {c_}, allowlisted {sum(len(x) for x in a_.values())} {({k: len(x) for k, x in a_.items()})}, uncovered {len(u_)}")
+
+
+def test_headline_none_significantly_better_for_gdp_h1_and_rejections_are_mostly_worse():
+    """README/paper say none of the GDP h=1 specs beats the core VAR significantly, and that the 3.8% of
+    two-sided rejections are almost all the shocked model being worse (dm_stat > 0)."""
+    d = J(PS)
+    assert d["gdp1_vs_core"]["n_sig_better_5pct"] == 0
+    assert abs(d["gdp1_vs_core"]["share_below_core"] - 2 / 3) < 0.02   # "two thirds" in the READMEs
+    assert d["dm_worse_share_5pct"] > d["dm_better_share_5pct"]        # "most significant results go the other way"
+    assert d["dm_worse_share_5pct"] > 0.95 * d["dm_sig_share_5pct"]
+    assert abs(d["dm_sig_share_5pct"] - d["dm_better_share_5pct"] - d["dm_worse_share_5pct"]) < 0.002
