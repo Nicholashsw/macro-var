@@ -20,7 +20,7 @@ nicholashong.dev}}
 \begingroup\renewcommand\thefootnote{}\footnotetext{Built for educational and research purposes. Not financial advice. All data are public (FRED, Federal Reserve Bank of New York).}\endgroup
 
 \begin{abstract}
-This paper runs a large-scale permutation study of vector autoregressions with exogenous shocks (VARX) on US quarterly data from 1990Q1 to 2026Q1. The design crosses 16 endogenous variable sets built around a three-variable core (GDP growth, core PCE inflation, and a policy stance defined as the real federal funds rate minus the Holston-Laubach-Williams natural rate) with 12 exogenous shock subsets drawn from real oil price, private investment, household net worth, and government spending growth, three shock treatments (raw, purged of contemporaneous GDP, and purged of the full endogenous vector), and three information-criterion lag rules, for 1{,}632 specification cells and 1{,}014 unique models. All models are evaluated in an expanding-window walk-forward from 2009Q4 at horizons of one, four, and eight quarters, under both an unconditional exogenous path and the realized path. Four results stand out. First, exogenous shocks improve point forecasts at every horizon, and stacking all four shocks helps rather than overfits when each shock enters with only two lags: the best GDP specification cuts h=1 RMSE by 12 percent against the best pure VAR. Second, residualization is an identification tool rather than a forecasting tool: purging the shocks costs accuracy for GDP, inflation, and the dollar, and pays only in the interest rate equation. Third, BIC is the better lag rule for three of four targets, while the persistent stance variable rewards the longer AIC lags. Fourth, almost nothing is statistically distinguishable: only 4.0 percent of specifications beat the core VAR at the 5 percent level in Diebold-Mariano tests, which is what noise alone would deliver. A real-time replication on ALFRED vintages confirms that the GDP shock advantage survives publication lags and national-accounts revisions almost intact, from 16.1 percent to 15.9 percent, while purging the shocks against a still-unrevised GDP number is the one choice that degrades sharply out of vintage. Replacing the growth-rate proxies with externally identified oil and monetary shocks does not improve forecasts and the proxy encompasses the identified shock almost everywhere, and a density evaluation shows the shock models' apparent sharpness is an artifact of holding future shocks fixed: once future-shock uncertainty is priced in, their predictive distributions are no tighter than the pure VAR's while their naive intervals are badly overconfident.
+This paper runs a large-scale permutation study of vector autoregressions with exogenous shocks (VARX) on US quarterly data from 1990Q1 to 2026Q1. The design crosses 16 endogenous variable sets built around a three-variable core (GDP growth, core PCE inflation, and a policy stance defined as the real federal funds rate minus the Holston-Laubach-Williams natural rate) with 12 exogenous shock subsets drawn from real oil price, private investment, household net worth, and government spending growth, three shock treatments (raw, purged of contemporaneous GDP, and purged of the full endogenous vector), and three information-criterion lag rules, for 1{,}632 specification cells and 1{,}014 unique models. All models are evaluated in an expanding-window walk-forward from 2009Q4 at horizons of one, four, and eight quarters, under both an unconditional exogenous path and the realized path. Four results stand out. First, exogenous shocks improve point forecasts at every horizon, and stacking all four shocks helps rather than overfits when each shock enters with only two lags: the best GDP specification cuts h=1 RMSE by 12 percent against the best pure VAR. Second, residualization is an identification tool rather than a forecasting tool: purging the shocks costs accuracy for GDP, inflation, and the dollar, and pays only in the interest rate equation. Third, BIC, the main lag rule, beats AIC for three of four targets, and AIC wins only for the persistent stance variable. Fourth, almost nothing is statistically distinguishable: only 3.8 percent of specifications beat the core VAR at the 5 percent level in Diebold-Mariano tests, which is what noise alone would deliver. A real-time replication on ALFRED vintages confirms that the GDP shock advantage survives publication lags and national-accounts revisions almost intact, from 16.6 percent to 15.8 percent, while purging the shocks against a still-unrevised GDP number is the one choice that degrades sharply out of vintage. Replacing the growth-rate proxies with externally identified oil and monetary shocks does not improve forecasts and the proxy encompasses the identified shock almost everywhere, and a density evaluation shows the shock models' apparent sharpness is an artifact of holding future shocks fixed: once future-shock uncertainty is priced in, their predictive distributions are no tighter than the pure VAR's while their naive intervals are badly overconfident.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -80,7 +80,7 @@ where $Y_t$ is the chosen endogenous vector ($n \in \{3,4,5\}$), $X_t$ the chose
 Let $x_t$ be a raw shock series. The GDP purge replaces it with the residual of $x_t$ on $[1, g_t]$, where $g_t$ is GDP growth; the full purge uses $[1, Y_t, Y_{t-1}]$ for the specification's own endogenous vector. Both projections are re-fit on each training window and the fitted coefficients applied to the full sample, so the purge is leak-free by construction. The full purge approximates treating the shock as an external instrument stripped of its systematic response to the endogenous block.
 
 \subsection{Lag selection and validity}
-Lag order minimizes AIC, BIC, or HQIC over $p \in \{1,\dots,4\}$ on the initial training window (1990Q1 to 2009Q4) and is held fixed across origins to avoid specification churn, subject to a hard guard of at least three observations per estimated parameter. Before any ranking, every model must pass validity gates: largest companion eigenvalue below one, minimum Ljung-Box whiteness p-value above 0.01 across equations at eight lags, and the degrees-of-freedom guard. The gates keep 85.6 percent of specifications; ranking only gated models prevents unstable or misspecified systems from winning by luck.
+BIC is the main lag rule and every headline result uses it; AIC and HQIC are run on the same grid as robustness checks and reported separately. The lag order minimizes the criterion over $p \in \{1,\dots,4\}$ on the initial training window (1990Q1 to 2009Q4) and is held fixed across origins to avoid specification churn, subject to a hard guard of at least three observations per estimated parameter. Before any ranking, every model must pass validity gates: largest companion eigenvalue below one, minimum Ljung-Box whiteness p-value above 0.01 across equations at eight lags, and the degrees-of-freedom guard. The gates keep 85.6 percent of specifications; ranking only gated models prevents unstable or misspecified systems from winning by luck.
 
 \subsection{Walk-forward evaluation}
 Forecasts are iterated from 65 expanding-window origins, 2009Q4 through 2025Q4, at horizons $h \in \{1,4,8\}$. Future dummies are zero. Future shocks follow one of two paths: the unconditional path sets them to their training-window mean, which is the honest forecast, and the realized path uses actual future values, which is a scenario exercise measuring the value of knowing the shock path. Metrics are RMSE, MAE, out-of-sample $R^2$ defined as one minus the MSE ratio against a univariate AR benchmark with BIC-selected order, and a Diebold-Mariano test \cite{dm1995} on squared-error loss against the core three-variable VAR under the same lag rule, with HAC variance at $h-1$ lags. All metrics are reported for the full window and excluding target quarters from 2020Q1 to 2021Q1.
@@ -88,10 +88,10 @@ Forecasts are iterated from 65 expanding-window origins, 2009Q4 through 2025Q4, 
 \section{Results}
 
 \subsection{Leaderboards}
-Table~\ref{tab:leader} reports the best validity-gated specification per target and horizon under the unconditional path. Three patterns recur. Every winner includes shocks. The winning treatment is raw for GDP and the dollar at short horizons, fully purged for inflation, and GDP-purged or raw for the stance. And the winning lag rule tracks the persistence of the target: BIC for GDP and the dollar, AIC with $p=3$ or $p=4$ for the stance.
+Table~\ref{tab:leader} reports the best validity-gated specification per target and horizon under the unconditional path, using the main lag rule, BIC. Three patterns recur. Every winner includes shocks. The winning treatment is raw for GDP at one and four quarters, fully purged for inflation, and for the stance fully purged at one quarter and raw at four and eight; the dollar's best is GDP-purged. And BIC selects $p=2$ for every winner.
 
 \begin{table}[t]
-\caption{Best specification per target and horizon, unconditional path, full window, validity-gated. Add-ons listed beyond the core; RMSE of the best shockless VAR in the last column.}
+\caption{Best specification per target and horizon, BIC lag rule, unconditional path, full window, validity-gated. Add-ons listed beyond the core; RMSE of the best shockless VAR in the last column.}
 \label{tab:leader}
 \centering
 \small
@@ -100,23 +100,23 @@ Table~\ref{tab:leader} reports the best validity-gated specification per target 
 \toprule
 Target, $h$ & Add-ons & Shocks & Treat, $p$ & RMSE & $R^2_{oos}$ & VAR \\
 \midrule
-GDP, 1 & spread & all four & raw, 2 & 5.65 & 0.33 & 6.40 \\
-GDP, 4 & fx, perm & wlth, fis & raw, 2 & 6.02 & 0.00 & 6.04 \\
-GDP, 8 & none & inv, fis & gdp, 2 & 6.16 & 0.01 & 6.17 \\
-Inf, 1 & emp, perm & inv, wlth & full, 2 & 0.83 & 0.07 & 0.87 \\
-Inf, 4 & fx & oil, wlth & full, 2 & 1.19 & 0.00 & 1.23 \\
-Stance, 1 & none & inv, fis & gdp, 4 & 0.42 & $-$0.11 & 0.45 \\
-Stance, 4 & none & inv & raw, 4 & 1.35 & 0.10 & 1.56 \\
-Stance, 8 & fx, emp & inv, wlth & raw, 3 & 1.65 & 0.40 & 1.88 \\
-FX, 1 & fx, perm & oil, wlth & gdp, 2 & 8.35 & 0.04 & 8.99 \\
+GDP, 1 & spread & all four & raw, 2 & 5.64 & 0.33 & 6.44 \\
+GDP, 4 & fx, perm & wlth, fis & raw, 2 & 6.01 & 0.00 & 6.04 \\
+GDP, 8 & emp & all four & gdp, 2 & 6.16 & 0.01 & 6.17 \\
+Inf, 1 & emp, spread & inv, wlth & full, 2 & 0.79 & 0.08 & 0.85 \\
+Inf, 4 & fx & oil, wlth & full, 2 & 1.18 & 0.01 & 1.22 \\
+Stance, 1 & wage & oil & full, 2 & 0.45 & $-$0.29 & 0.45 \\
+Stance, 4 & perm & inv & raw, 2 & 1.56 & $-$0.22 & 1.61 \\
+Stance, 8 & fx, perm & oil, wlth & raw, 2 & 2.01 & 0.10 & 2.08 \\
+FX, 1 & fx, perm & oil, wlth & gdp, 2 & 8.35 & 0.05 & 9.72 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The out-of-sample $R^2$ column calibrates expectations. GDP at $h=1$ is genuinely forecastable relative to an AR benchmark (0.33 on the full window, 0.10 excluding COVID quarters). Inflation and the dollar are barely forecastable (0.07 and 0.04). The stance loses to its own AR at $h=1$, where persistence dominates, but the multivariate system with shocks earns $R^2_{oos}=0.40$ at $h=8$: the system-based forecast of where the rate gap mean-reverts to is the single largest forecasting gain in the study, consistent with earlier evidence that gap-based rate variables help most for the rate's own forecast.
+The out-of-sample $R^2$ column calibrates expectations. GDP at $h=1$ is genuinely forecastable relative to an AR benchmark (0.33 on the full window, 0.10 excluding COVID quarters). Inflation and the dollar are barely forecastable (0.08 and 0.05). The stance loses to its own AR at $h=1$ and $h=4$, where persistence dominates, and earns $R^2_{oos}=0.10$ at $h=8$. AIC, which picks longer lags for the stance, does better there: its best $h=8$ stance RMSE is 1.62 against 2.01 under BIC.
 
 \subsection{Shock stacking does not overfit here}
-Median h=1 GDP RMSE across gated specifications falls monotonically in the number of included shocks: 6.91 with none, 6.82 with one, 6.47 with two, and 5.92 with all four (Fig.~\ref{fig:stack}). This is the opposite of the catastrophic stacking result that arises when shocks enter with deep lag structures or when shock construction leaks full-sample information. The reconciliation is parameter cost: at two coefficients per equation per shock, with COVID dummies absorbing the outlier quarters, each additional shock behaves like an additional leading indicator. The result should not be extrapolated to designs with longer exogenous lag depth, where the same stacking destroys performance.
+Median h=1 GDP RMSE across gated specifications falls monotonically in the number of included shocks: 6.76 with none, 6.61 with one, 6.30 with two, and 5.81 with all four (Fig.~\ref{fig:stack}). This is the opposite of the catastrophic stacking result that arises when shocks enter with deep lag structures or when shock construction leaks full-sample information. The reconciliation is parameter cost: at two coefficients per equation per shock, with COVID dummies absorbing the outlier quarters, each additional shock behaves like an additional leading indicator. The result should not be extrapolated to designs with longer exogenous lag depth, where the same stacking destroys performance.
 
 \begin{figure}[t]
 \centering
@@ -126,10 +126,10 @@ Median h=1 GDP RMSE across gated specifications falls monotonically in the numbe
 \end{figure}
 
 \subsection{Residualization is not a free lunch}
-Table~\ref{tab:treat} compares median h=1 RMSE across shocked specifications by treatment. Raw shocks win for GDP (6.24 against 6.68 GDP-purged and 6.75 fully purged), inflation, and the dollar. The stance is the exception, where both purges beat raw. The economics is straightforward: investment and net worth growth carry contemporaneous business-cycle information that predicts next quarter's activity, and projecting that component out removes exactly the signal a forecaster wants. The policy rate, by contrast, responds to the systematic component of demand, so removing it isolates the innovation that still carries marginal news. Purging is the right tool when the question is structural and the wrong default when the question is predictive.
+Table~\ref{tab:treat} compares median h=1 RMSE across shocked specifications by treatment. Raw shocks win for GDP (6.05 against 6.45 GDP-purged and 6.51 fully purged), inflation, and the dollar. The stance is the exception, where both purges beat raw. The economics is straightforward: investment and net worth growth carry contemporaneous business-cycle information that predicts next quarter's activity, and projecting that component out removes exactly the signal a forecaster wants. The policy rate, by contrast, responds to the systematic component of demand, so removing it isolates the innovation that still carries marginal news. Purging is the right tool when the question is structural and the wrong default when the question is predictive.
 
 \begin{table}[t]
-\caption{Median h=1 RMSE across shocked, validity-gated specifications by shock treatment, unconditional path, full window.}
+\caption{Median h=1 RMSE across shocked, validity-gated specifications by shock treatment, BIC lag rule, unconditional path, full window.}
 \label{tab:treat}
 \centering
 \small
@@ -137,22 +137,22 @@ Table~\ref{tab:treat} compares median h=1 RMSE across shocked specifications by 
 \toprule
 Target & Raw & GDP-purged & Fully purged \\
 \midrule
-GDP & \textbf{6.24} & 6.68 & 6.75 \\
-Inflation & \textbf{1.00} & 1.01 & 1.03 \\
-Stance & 0.56 & 0.55 & \textbf{0.55} \\
-FX & \textbf{9.90} & 9.95 & 10.29 \\
+GDP & \textbf{6.05} & 6.45 & 6.51 \\
+Inflation & \textbf{0.95} & 0.96 & 0.99 \\
+Stance & 0.56 & \textbf{0.55} & 0.55 \\
+FX & \textbf{9.04} & 9.39 & 10.14 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Lag rules}
-BIC selects $p \in \{1,2\}$, HQIC selects $p=2$ almost everywhere, and AIC spreads across $p \in \{2,3,4\}$. On median RMSE at $h=1$, BIC beats AIC for GDP (6.46 against 6.63), inflation (0.99 against 1.07), and the dollar (9.66 against 10.34); AIC wins only for the stance (0.555 against 0.558), where the longer lags capture persistence. The standard warning that AIC overfits out of sample survives for three of four targets, and HQIC at $p=2$ is a defensible single default when running one rule.
+\subsection{Lag rules as a robustness check}
+BIC is the main rule; AIC and HQIC are run on the same specifications. BIC selects $p \in \{1,2\}$ (227 and 317 specifications), HQIC selects $p=2$ almost everywhere, and AIC spreads across $p \in \{2,3,4\}$. On median RMSE at $h=1$ over all three rules, BIC beats AIC for GDP (6.44 against 6.62), inflation (0.96 against 1.04), and the dollar (9.67 against 10.32); AIC wins only for the stance (0.550 against 0.554), where the longer lags capture persistence. The standard warning that AIC overfits out of sample survives for three of four targets. The headline results above do not depend on the rule for GDP at one quarter: the best $h=1$ GDP RMSE is 5.641 under BIC and 5.641 under HQIC, and 5.660 under AIC.
 
 \subsection{The value of knowing the shock path}
-Table~\ref{tab:path} reports median GDP RMSE by horizon, treatment, and exogenous path. At $h=1$ conditioning on the realized path adds little for purged shocks, because the lagged shock is already in the information set, but is worth 0.24 points for raw shocks. By $h=8$ the realized path is worth roughly 0.3 points for every treatment. That gap is the ceiling on what a perfect shock nowcasting operation could buy in this design, and it is modest relative to the roughly 6-point unconditional RMSE: most of the shocks' forecasting value lives in their current and lagged values, not in clairvoyance about their future.
+Table~\ref{tab:path} reports median GDP RMSE by horizon, treatment, and exogenous path. At $h=1$ conditioning on the realized path adds little for purged shocks, because the lagged shock is already in the information set, but is worth 0.18 points for raw shocks. By $h=8$ the realized path is worth between 0.21 and 0.34 points depending on the treatment. That gap is the ceiling on what a perfect shock nowcasting operation could buy in this design, and it is modest relative to the roughly 6-point unconditional RMSE: most of the shocks' forecasting value lives in their current and lagged values, not in clairvoyance about their future.
 
 \begin{table}[t]
-\caption{Median GDP RMSE by exogenous path assumption, shocked specifications, full window.}
+\caption{Median GDP RMSE by exogenous path assumption, shocked specifications, BIC lag rule, full window.}
 \label{tab:path}
 \centering
 \small
@@ -160,21 +160,21 @@ Table~\ref{tab:path} reports median GDP RMSE by horizon, treatment, and exogenou
 \toprule
 $h$ & Treatment & Uncond. & Realized & Gap \\
 \midrule
-1 & raw & 6.24 & 6.00 & 0.24 \\
-1 & GDP-purged & 6.68 & 6.72 & $-$0.03 \\
-1 & fully purged & 6.75 & 6.82 & $-$0.08 \\
-4 & raw & 6.08 & 5.76 & 0.32 \\
-4 & GDP-purged & 6.13 & 5.97 & 0.16 \\
-4 & fully purged & 6.19 & 6.12 & 0.08 \\
-8 & raw & 6.19 & 5.87 & 0.32 \\
-8 & GDP-purged & 6.20 & 5.93 & 0.27 \\
-8 & fully purged & 6.22 & 6.04 & 0.18 \\
+1 & raw & 6.05 & 5.87 & 0.18 \\
+1 & GDP-purged & 6.45 & 6.44 & 0.01 \\
+1 & fully purged & 6.51 & 6.42 & 0.09 \\
+4 & raw & 6.06 & 5.71 & 0.35 \\
+4 & GDP-purged & 6.09 & 5.91 & 0.18 \\
+4 & fully purged & 6.13 & 6.05 & 0.08 \\
+8 & raw & 6.18 & 5.84 & 0.34 \\
+8 & GDP-purged & 6.19 & 5.88 & 0.31 \\
+8 & fully purged & 6.20 & 5.99 & 0.21 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{Statistical indistinguishability}
-Across all validity-gated specifications, targets, and horizons, only 4.0 percent of Diebold-Mariano tests against the core VAR reject at the 5 percent level, indistinguishable from the false-positive rate under the null. The best GDP specification's rejection p-value is 0.38 on the full window. With 65 evaluation points and squared-error loss dominated by a handful of quarters, the leaderboard ordering among the top specifications is not statistically meaningful, and the honest summary is a set of near-equivalent models spanned by oil, net worth, and one real-activity shock in raw form. This mirrors the model-confidence-set finding that disciplined macro forecasting comparisons rarely separate from simple benchmarks \cite{hansen2011}.
+Across all validity-gated specifications, targets, and horizons under BIC, only 3.8 percent of Diebold-Mariano tests against the core VAR reject at the 5 percent level, indistinguishable from the false-positive rate under the null. The best GDP specification's rejection p-value is 0.38 on the full window. With 65 evaluation points and squared-error loss dominated by a handful of quarters, the leaderboard ordering among the top specifications is not statistically meaningful, and the honest summary is a set of near-equivalent models spanned by oil, net worth, and one real-activity shock in raw form. This mirrors the model-confidence-set finding that disciplined macro forecasting comparisons rarely separate from simple benchmarks \cite{hansen2011}.
 
 \begin{figure}[t]
 \centering
@@ -184,12 +184,12 @@ Across all validity-gated specifications, targets, and horizons, only 4.0 percen
 \end{figure}
 
 \section{What Not To Do}
-The study's negative results are as actionable as its positive ones. Do not purge shocks by default; it costs forecast accuracy everywhere except the rate equation. Do not use AIC as the house lag rule on quarterly macro data. Do not stack shocks in designs with deep exogenous lag structures on the strength of the stacking result here, which depends on the two-lag cap and the COVID dummies. Do not report full-window GDP gains without the ex-COVID counterpart, since the headline $R^2_{oos}$ of 0.33 falls to 0.10 once the 2020 reversal quarters are excluded. And do not present the top of the leaderboard as a discovery; present it as one member of a large statistically equivalent set.
+The study's negative results are as actionable as its positive ones. Do not purge shocks by default; it costs forecast accuracy everywhere except the rate equation. Use BIC as the main lag rule on quarterly macro data and treat AIC as a check: it pays only for the persistent stance variable. Do not stack shocks in designs with deep exogenous lag structures on the strength of the stacking result here, which depends on the two-lag cap and the COVID dummies. Do not report full-window GDP gains without the ex-COVID counterpart, since the headline $R^2_{oos}$ of 0.33 falls to 0.10 once the 2020 reversal quarters are excluded. And do not present the top of the leaderboard as a discovery; present it as one member of a large statistically equivalent set.
 
 \section{Real-Time Robustness}
 The final-vintage results assume an end-of-quarter information set on revised data, which flatters any model that leans on the national accounts. To test how much of the shock advantage is an artifact of that assumption, the core comparison is re-run on the archival vintages recorded in ALFRED. For each origin the panel is rebuilt from the data vintage current roughly 45 days after the quarter closed, just after the advance GDP print, which carries both the publication lag (net worth trails the output block by a quarter, and the 2018 to 2019 shutdown delayed one print entirely) and the pre-revision values of every national-accounts series. Revisions concentrate in that block, so GDP, core PCE, investment, government spending, and net worth are pulled at their contemporaneous vintages; the federal funds rate, oil, and CPI are held at final values because they are not meaningfully revised, and the HLW natural rate is held at its final one-sided estimate for want of a real-time series. Forecasts are scored against final actuals so the numbers line up with Table~\ref{tab:leader}.
 
-Table~\ref{tab:rt} reports the outcome for GDP. The absolute RMSE of every specification rises by one to six percent out of vintage, an almost parallel shift visible in Fig.~\ref{fig:rt}, but the relative advantage of the all-four-shock system over the pure VAR is essentially unchanged: 16.1 percent falls to 15.9 percent on the full window and 8.1 percent to 8.0 percent excluding COVID, with the shocked system still earning a real-time out-of-sample $R^2$ of 0.42 against the AR benchmark. The one fragile choice is residualization. Purging the shocks against contemporaneous GDP means projecting on a GDP figure that is itself heavily revised, so the GDP-purged system degrades by 35 percent out of vintage against 5 percent for the raw system, turning a near-tie on final data into a clear loss. The real-time exercise therefore sharpens rather than softens the two main practical conclusions: shock augmentation is a genuine and robust help for GDP at short horizons, and raw shocks are preferable to purged ones, now for the additional reason that purging imports revision noise.
+Table~\ref{tab:rt} reports the outcome for GDP. The absolute RMSE of the pure VAR and the all-four-shock system rises by roughly five percent out of vintage, an almost parallel shift visible in Fig.~\ref{fig:rt}, but the relative advantage of the all-four-shock system over the pure VAR is essentially unchanged: 16.6 percent falls to 15.8 percent on the full window and 7.5 percent to 7.8 percent excluding COVID, with the shocked system still earning a real-time out-of-sample $R^2$ of 0.42 against the AR benchmark. The one fragile choice is residualization. Purging the shocks against contemporaneous GDP means projecting on a GDP figure that is itself heavily revised, so the GDP-purged system degrades by 35 percent out of vintage against 6 percent for the raw system, turning a near-tie on final data into a clear loss. The real-time exercise therefore sharpens rather than softens the two main practical conclusions: shock augmentation is a genuine and robust help for GDP at short horizons, and raw shocks are preferable to purged ones, now for the additional reason that purging imports revision noise.
 
 \begin{table}[t]
 \caption{GDP forecast RMSE, final vintage against real-time ALFRED vintages, core specifications, unconditional path. Advantage is the RMSE reduction of the all-four-shock system relative to the pure VAR.}
@@ -203,9 +203,9 @@ Table~\ref{tab:rt} reports the outcome for GDP. The absolute RMSE of every speci
 \cmidrule(l){3-4}\cmidrule(l){5-6}
 $h$ & Model & Final & Real-time & Final & Real-time \\
 \midrule
-1 & Pure VAR & 6.74 & 7.10 & 1.90 & 1.93 \\
-1 & All four, raw & 5.66 & 5.97 & 1.74 & 1.78 \\
-1 & \emph{Advantage} & \emph{16.1\%} & \emph{15.9\%} & \emph{8.1\%} & \emph{8.0\%} \\
+1 & Pure VAR & 6.77 & 7.08 & 1.84 & 1.88 \\
+1 & All four, raw & 5.65 & 5.96 & 1.70 & 1.73 \\
+1 & \emph{Advantage} & \emph{16.6\%} & \emph{15.8\%} & \emph{7.5\%} & \emph{7.8\%} \\
 1 & All four, GDP-purged & 5.70 & 7.68 & --- & --- \\
 \bottomrule
 \end{tabular}
@@ -221,11 +221,11 @@ $h$ & Model & Final & Real-time & Final & Real-time \\
 \section{External Identification}
 The shocks used throughout are growth-rate proxies. A natural objection is that a properly identified structural shock would carry cleaner information and forecast better. The oil block lets us test this directly. Kaenzig's~\cite{kanzig2021} oil supply news shock, identified from high-frequency movements in oil futures around OPEC announcements, is available monthly from 1975 and summed here to quarters, so unlike the identified fiscal series it spans the whole evaluation window. Three exogenous regressors are compared inside the core VARX at $p=2$: the study's own real-oil-price growth proxy, which is leak-free and persistent; Kaenzig's surprise instrument, which is leak-free but zero outside announcement quarters; and Kaenzig's news shock recovered from his full-sample SVAR-IV, which is dense but, as a regressor, embeds sample-wide information the other two do not. That look-ahead stacks the deck for identification.
 
-Table~\ref{tab:id} shows it changes nothing. No identified regressor beats the raw proxy where oil matters. On the full window at $h=1$ the raw proxy cuts inflation RMSE by 7.0 percent against 4.4 percent for the news shock and 2.5 percent for the surprise, and it is the only oil regressor that helps GDP at all, while the look-ahead-advantaged news shock is the worst of the three for GDP. Across all twelve target, horizon, and window cells the raw proxy beats the pure VAR in eight and the news shock in only three, and no Diebold-Mariano test rejects at the 5 percent level. The reason is structural rather than incidental: identification orthogonalizes away the persistent, predictable component of oil-price movements, which is exactly the component a point forecaster wants. Identification and prediction pull in opposite directions, so the cheap proxy is not a compromise here, it is the better tool.
+Table~\ref{tab:id} shows it changes nothing. No identified regressor beats the raw proxy where oil matters. On the full window at $h=1$ the raw proxy cuts inflation RMSE by 7.6 percent against 5.0 percent for the news shock and 2.8 percent for the surprise, and it is the only oil regressor that helps GDP at all, while the look-ahead-advantaged news shock is the worst of the three for GDP. Across all twelve target, horizon, and window cells the raw proxy beats the pure VAR in 8 and the news shock in only 4, and no Diebold-Mariano test rejects at the 5 percent level. The reason is structural rather than incidental: identification orthogonalizes away the persistent, predictable component of oil-price movements, which is exactly the component a point forecaster wants. Identification and prediction pull in opposite directions, so the cheap proxy is not a compromise here, it is the better tool.
 
-The monetary margin is the natural place to look for a counterexample, because the stance variable is the weakest of the three core proxies and a high-frequency surprise moves even at the zero lower bound, where a simple rate change is flat. Bauer and Swanson's~\cite{bauerswanson2023} FOMC surprises, added as an exogenous regressor to the core over their 2009 to 2023 coverage, do not provide one. Table~\ref{tab:mp} shows the raw surprise helps core inflation at the four-quarter horizon by about one percent, the one place monetary identification shows any forecast value and the horizon its transmission lag predicts, but the gain is small, insignificant, and absent for GDP, where the identified shocks degrade forecasts, significantly so out of vintage for the orthogonalized series. As with oil, the orthogonalized surprise, the cleaner shock, is worse than the raw one in eleven of twelve cells. The same pattern recurs on both margins: the more a series is processed toward clean structural identification, the less predictable variation it retains and the worse it forecasts. The canonical externally identified fiscal shock, Ramey and Zubairy's military news series~\cite{ramey2011}, ends in 2015 and is near-flat post-1990, so the fiscal margin cannot be tested the same way.
+The monetary margin is the natural place to look for a counterexample, because the stance variable is the weakest of the three core proxies and a high-frequency surprise moves even at the zero lower bound, where a simple rate change is flat. Bauer and Swanson's~\cite{bauerswanson2023} FOMC surprises, added as an exogenous regressor to the core over their 2009 to 2023 coverage, do not provide one. Table~\ref{tab:mp} shows the raw surprise helps core inflation at the four-quarter horizon by about 1 percent, the one place monetary identification shows any forecast value and the horizon its transmission lag predicts, but the gain is small, insignificant, and absent for GDP, where the identified shocks degrade forecasts, significantly so excluding COVID quarters for the orthogonalized series. As with oil, the orthogonalized surprise, the cleaner shock, is worse than the raw one in 11 of twelve cells. The same pattern recurs on both margins: the more a series is processed toward clean structural identification, the less predictable variation it retains and the worse it forecasts. The canonical externally identified fiscal shock, Ramey and Zubairy's military news series~\cite{ramey2011}, ends in 2015 and is near-flat post-1990, so the fiscal margin cannot be tested the same way.
 
-Whether the two small isolated edges add up is the last question, and they do not. Combining the proxy and identified forecasts, by equal weights or by leak-free inverse-MSE weights, is 0.2 to 0.8 percent worse than keeping the better single model in every margin and target group; the blend dilutes rather than sharpens. In a forecast-encompassing regression the proxy forecast encompasses the identified one in twenty-two of twenty-four cells, so identification adds nothing conditional on the proxy. The two exceptions, core inflation at eight quarters on the monetary margin, resolve to the best convex blend placing full weight on the identified forecast for a 0.4 percent edge no Diebold-Mariano test separates from zero. The identified shocks are not a missing ingredient the proxies lack; they are redundant with information the proxies already carry, minus the predictable variation identification is built to remove.
+Whether the two small isolated edges add up is the last question, and they do not. Combining the proxy and identified forecasts, by equal weights or by leak-free inverse-MSE weights, is 0.2 to 0.8 percent worse than keeping the better single model in every margin and target group; the blend dilutes rather than sharpens. In a forecast-encompassing regression the proxy forecast encompasses the identified one in 21 of 24 cells, so identification adds nothing conditional on the proxy. The three exceptions are core inflation at one quarter excluding COVID on the oil margin and core inflation at eight quarters on the monetary margin, on the full window and excluding COVID. The identified shocks are not a missing ingredient the proxies lack; they are redundant with information the proxies already carry, minus the predictable variation identification is built to remove.
 
 \begin{table}[t]
 \caption{GDP and core-inflation forecast RMSE at $h=1$, core VARX with one exogenous oil regressor, unconditional path. Lower is better; the pure VAR is the no-shock baseline. No difference is significant at 5 percent.}
@@ -239,16 +239,16 @@ Whether the two small isolated edges add up is the last question, and they do no
 \cmidrule(l){2-3}\cmidrule(l){4-5}
 Oil regressor & Full & Ex COVID & Full & Ex COVID \\
 \midrule
-Pure VAR (none) & 6.79 & 1.90 & 1.03 & 0.76 \\
-Raw growth proxy & \textbf{6.66} & 1.92 & \textbf{0.96} & 0.77 \\
-HF surprise instrument & 6.79 & 1.89 & 1.00 & 0.76 \\
-Identified news shock & 6.91 & 1.91 & 0.98 & 0.76 \\
+Pure VAR (none) & 6.77 & 1.84 & 1.00 & 0.73 \\
+Raw growth proxy & \textbf{6.64} & 1.86 & \textbf{0.93} & 0.74 \\
+HF surprise instrument & 6.78 & \textbf{1.83} & 0.97 & 0.73 \\
+Identified news shock & 6.89 & 1.85 & 0.95 & \textbf{0.73} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \begin{table}[t]
-\caption{Monetary margin: forecast RMSE for GDP at $h=1$ and core inflation at $h=4$, core VARX with one exogenous monetary regressor, 2009 to 2023 origins. The core carries the stance variable endogenously and is the baseline. No difference is significant at 5 percent.}
+\caption{Monetary margin: forecast RMSE for GDP at $h=1$ and core inflation at $h=4$, core VARX with one exogenous monetary regressor, 2009 to 2023 origins. The core carries the stance variable endogenously and is the baseline. Differences are not significant at the 5 percent level except GDP excluding COVID, where the fed funds change and the orthogonalized surprise are significantly worse than the core.}
 \label{tab:mp}
 \centering
 \small
@@ -259,10 +259,10 @@ Identified news shock & 6.91 & 1.91 & 0.98 & 0.76 \\
 \cmidrule(l){2-3}\cmidrule(l){4-5}
 Monetary regressor & Full & Ex COVID & Full & Ex COVID \\
 \midrule
-Core only (stance) & 7.27 & 1.89 & 1.23 & 1.20 \\
-Fed funds change & 7.03 & 2.07 & 1.26 & 1.22 \\
-Raw MPS surprise & 7.31 & 1.93 & \textbf{1.22} & \textbf{1.18} \\
-Orthogonalized MPS & 7.61 & 2.08 & 1.23 & 1.20 \\
+Core only (stance) & 7.26 & \textbf{1.87} & 1.23 & 1.21 \\
+Fed funds change & \textbf{7.03} & 2.06 & 1.26 & 1.23 \\
+Raw MPS surprise & 7.30 & 1.91 & \textbf{1.22} & \textbf{1.19} \\
+Orthogonalized MPS & 7.60 & 2.06 & 1.24 & 1.21 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -270,7 +270,7 @@ Orthogonalized MPS & 7.61 & 2.08 & 1.23 & 1.20 \\
 \section{Density Forecasts}
 Every result so far scores the conditional mean, which is where exogenous shocks are weakest; their natural home is risk. A shock-augmented VARX absorbs in-sample variance, so its plug-in residual covariance is smaller and its predictive density tighter than the pure VAR's. Table~\ref{tab:dens} evaluates that density with interval coverage and the log predictive score for the core VAR against the all-four-shock model.
 
-Under the naive plug-in density, which holds future shocks at their training mean, the sharpening is a trap. The all-four-shock model's nominal 90 percent GDP interval covers only 68 percent of outcomes against 88 for the pure VAR, and the single COVID quarter, landing far outside the too-narrow density, drives its log score to minus thirteen. The density is not skillful, it is overconfident, and the cause is mechanical: holding future shocks at their mean ignores the uncertainty of the future shock path. Propagating that uncertainty through the same moving-average structure (Fig.~\ref{fig:dens}) restores GDP coverage to 91 percent and removes the log-score catastrophe, but it widens the intervals, because the in-sample variance the shocks explain is offset almost exactly by the cost of having to forecast the shocks. Under the honest density the shock model is no sharper than the pure VAR, every log-score difference is insignificant, and the one residual edge, GDP at one quarter on the full sample, is the same COVID-era mean advantage the point forecasts already show rather than a gain in calibrated uncertainty. Shocks do not earn their keep in the distribution any more than in the mean, and the practical lesson is that a shock-augmented VARX must price future-shock risk into its density or badly understate it.
+Under the naive plug-in density, which holds future shocks at their training mean, the sharpening is a trap. The all-four-shock model's nominal 90 percent GDP interval covers only 68 percent of outcomes against 88 for the pure VAR, and the single COVID quarter, landing far outside the too-narrow density, drives its log score to minus 13. The density is not skillful, it is overconfident, and the cause is mechanical: holding future shocks at their mean ignores the uncertainty of the future shock path. Propagating that uncertainty through the same moving-average structure (Fig.~\ref{fig:dens}) restores GDP coverage to 91 percent and removes the log-score catastrophe, but it widens the intervals, because the in-sample variance the shocks explain is offset almost exactly by the cost of having to forecast the shocks. Under the honest density the shock model is no sharper than the pure VAR, every log-score difference is insignificant, and the one residual edge, GDP at one quarter on the full sample, is the same COVID-era mean advantage the point forecasts already show rather than a gain in calibrated uncertainty. Shocks do not earn their keep in the distribution any more than in the mean, and the practical lesson is that a shock-augmented VARX must price future-shock risk into its density or badly understate it.
 
 \begin{table}[t]
 \caption{Predictive density at $h=1$, full window: 90 percent interval coverage and mean log score, under the naive plug-in density and the fair density that prices future-shock uncertainty. Coverage nearer 0.90 and higher log score are better.}
@@ -284,10 +284,10 @@ Under the naive plug-in density, which holds future shocks at their training mea
 \cmidrule(l){3-4}\cmidrule(l){5-6}
 Target & Model & Naive & Fair & Naive & Fair \\
 \midrule
-GDP & Pure VAR & 0.88 & 0.88 & $-6.49$ & $-6.49$ \\
-GDP & All four & 0.68 & 0.91 & $-13.01$ & $-4.78$ \\
-Inflation & Pure VAR & 0.82 & 0.82 & $-2.27$ & $-2.27$ \\
-Inflation & All four & 0.74 & 0.75 & $-2.45$ & $-2.19$ \\
+GDP & Pure VAR & 0.88 & 0.88 & $-$6.47 & $-$6.47 \\
+GDP & All four & 0.68 & 0.91 & $-$13.00 & $-$4.77 \\
+Inflation & Pure VAR & 0.82 & 0.82 & $-$2.20 & $-$2.20 \\
+Inflation & All four & 0.75 & 0.75 & $-$2.37 & $-$2.12 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -299,13 +299,13 @@ Inflation & All four & 0.74 & 0.75 & $-2.45$ & $-2.19$ \\
 \label{fig:dens}
 \end{figure}
 
-Even the fair density leaves the pure VAR itself a little under-covered, most visibly for long-horizon inflation, and two omissions could explain it: parameter uncertainty and non-Gaussian tails. A Bayesian predictive separates them. Simulating from a Normal-inverse-Wishart posterior centered at OLS, so that the coefficients and covariance are drawn rather than fixed, lifts the pure VAR's 90 percent coverage from 0.88 to 0.91 for GDP and from 0.80 to 0.85 for inflation at one quarter, closing the gap and over-covering at long horizons. Replacing the Gaussian forward shocks with residuals resampled from the training window does not help and slightly lowers coverage, because the COVID quarters are already absorbed by the dummies and the remaining residuals are close to Gaussian. The under-coverage is therefore estimation noise, not misspecification: a proper predictive that prices parameter uncertainty is well calibrated, and the only residual is a mild shortfall in long-horizon inflation intervals that a linear Gaussian VAR cannot fully close. Because parameter uncertainty widens every model's intervals alike, it leaves the cross-model verdict unchanged.
+Even the fair density leaves the pure VAR itself a little under-covered, most visibly for long-horizon inflation, and two omissions could explain it: parameter uncertainty and non-Gaussian tails. A Bayesian predictive separates them. Simulating from a Normal-inverse-Wishart posterior centered at OLS, so that the coefficients and covariance are drawn rather than fixed, lifts the pure VAR's 90 percent coverage from 0.88 to 0.91 for GDP and from 0.83 to 0.85 for inflation at one quarter, closing the gap and over-covering GDP at long horizons. Replacing the Gaussian forward shocks with residuals resampled from the training window does not help: for one-quarter inflation it lowers coverage from 0.83 to 0.77, because the COVID quarters are already absorbed by the dummies and the remaining residuals are close to Gaussian. The under-coverage is therefore estimation noise, not misspecification: a proper predictive that prices parameter uncertainty is well calibrated, and the only residual is a mild shortfall in long-horizon inflation intervals that a linear Gaussian VAR cannot fully close. Because parameter uncertainty widens every model's intervals alike, it leaves the cross-model verdict unchanged.
 
 \section{Limitations}
-Three caveats bound the conclusions. First, the real-time replication holds the financial series and the HLW natural rate at final values and uses the advance-vintage standpoint; a fully real-time exercise would also need vintage natural-rate estimates, which are not published, and would face the ragged edge at the very start of the sample where net worth has no archival record. Second, the HLW natural rate, while one-sided, is re-estimated by its authors over the full sample, so the stance variable inherits mild look-ahead through parameter revisions. Third, the external-identification check covers oil and monetary shocks but not fiscal ones, because no externally identified fiscal series spans the modern forecasting window with usable in-sample variation. Fourth, the headline density figures are plug-in; a Bayesian predictive check shows their under-coverage is parameter uncertainty rather than misspecification and that pricing it in leaves the cross-model comparison unchanged, but the long-horizon inflation intervals stay mildly narrow, which a linear Gaussian VAR cannot fully repair.
+Four caveats bound the conclusions. First, the real-time replication holds the financial series and the HLW natural rate at final values and uses the advance-vintage standpoint; a fully real-time exercise would also need vintage natural-rate estimates, which are not published, and would face the ragged edge at the very start of the sample where net worth has no archival record. Second, the HLW natural rate, while one-sided, is re-estimated by its authors over the full sample, so the stance variable inherits mild look-ahead through parameter revisions. Third, the external-identification check covers oil and monetary shocks but not fiscal ones, because no externally identified fiscal series spans the modern forecasting window with usable in-sample variation. Fourth, the headline density figures are plug-in; a Bayesian predictive check shows their under-coverage is parameter uncertainty rather than misspecification and that pricing it in leaves the cross-model comparison unchanged, but the long-horizon inflation intervals stay mildly narrow, which a linear Gaussian VAR cannot fully repair.
 
 \section{Conclusion}
-Across 1{,}632 specification cells, exogenous shock augmentation improves US macro point forecasts at every horizon, with the largest and most durable gain in the interest rate equation at long horizons. Raw shocks beat purged shocks wherever the target is real activity or prices, information criteria matter less than the persistence of the target variable, and essentially none of the ranking is statistically significant. A real-time replication on ALFRED vintages shows the GDP shock advantage is not an artifact of using revised data: it survives publication lags and revisions almost intact, and only the purged variant proves revision-fragile. Replacing the growth-rate proxies with externally identified shocks, Kaenzig's oil supply news on the oil margin and Bauer-Swanson FOMC surprises on the monetary margin, does not improve forecasts and often worsens them, and the more heavily a series is orthogonalized toward clean identification the worse it forecasts, because that processing strips exactly the predictable variation a point forecaster needs. Identification and prediction are different tasks, and for this one the cheap proxies are the right tool rather than a compromise. A forecast combination does not rescue the identified shocks: leak-free blends of the proxy and identified forecasts are uniformly a touch worse than the better component, and the proxy forecast encompasses the identified one almost everywhere. For reduced-form macro point forecasting, then, cheap growth-rate proxies are not a stopgap for properly identified shocks; they are the better instrument, precisely because forecasting rewards the predictable variation that identification is designed to remove. The same discipline extends to the predictive distribution: the shock models look sharper only because the naive density pretends the future shock path is known, and once that uncertainty is priced in the sharpness disappears and the pure VAR's intervals are just as good, so shocks earn their keep in neither the mean nor the tails.
+Across 1{,}632 specification cells, exogenous shock augmentation improves US macro point forecasts at every horizon, with the largest gain for GDP at one quarter. Raw shocks beat purged shocks wherever the target is real activity or prices, the lag rule matters for the persistent stance variable only, and essentially none of the ranking is statistically significant. A real-time replication on ALFRED vintages shows the GDP shock advantage is not an artifact of using revised data: it survives publication lags and revisions almost intact, and only the purged variant proves revision-fragile. Replacing the growth-rate proxies with externally identified shocks, Kaenzig's oil supply news on the oil margin and Bauer-Swanson FOMC surprises on the monetary margin, does not improve forecasts and often worsens them, and the more heavily a series is orthogonalized toward clean identification the worse it forecasts, because that processing strips exactly the predictable variation a point forecaster needs. Identification and prediction are different tasks, and for this one the cheap proxies are the right tool rather than a compromise. A forecast combination does not rescue the identified shocks: leak-free blends of the proxy and identified forecasts are uniformly a touch worse than the better component, and the proxy forecast encompasses the identified one almost everywhere. For reduced-form macro point forecasting, then, cheap growth-rate proxies are not a stopgap for properly identified shocks; they are the better instrument, precisely because forecasting rewards the predictable variation that identification is designed to remove. The same discipline extends to the predictive distribution: the shock models look sharper only because the naive density pretends the future shock path is known, and once that uncertainty is priced in the sharpness disappears and the pure VAR's intervals are just as good, so shocks earn their keep in neither the mean nor the tails.
 
 \begin{thebibliography}{9}
 \bibitem{sims1980} C. A. Sims, ``Macroeconomics and reality,'' \emph{Econometrica}, vol. 48, no. 1, pp. 1--48, 1980.
