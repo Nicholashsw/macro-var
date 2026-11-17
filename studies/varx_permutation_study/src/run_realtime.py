@@ -8,7 +8,8 @@ import varx_realtime as rt
 t0 = time.time()
 finals = rt.load_finals()
 
-# AR lag orders used in the main study (BIC on the initial window)
+# AR lag orders used in the main study (BIC on the initial window); the final-vintage
+# comparison below uses the main lag rule (BIC) rows of the main study
 train_end_i = finals["panel"].index.get_loc(pd.Period(vl.TRAIN_END, freq="Q").to_timestamp())
 bench = vl.ar_benchmark(finals["panel"], ["gdp", "inf"], train_end_i,
                         list(range(train_end_i, len(finals["panel"]) - 1)))
@@ -36,7 +37,7 @@ name_map = {
 fin_rows = []
 for name, (endog, shocks, treat) in name_map.items():
     sub = res[(res.endog == endog) & (res.shocks == shocks) & (res.treatment == treat)
-              & (res.path == "uncond")]
+              & (res.path == "uncond") & (res.lag_rule == vl.MAIN_RULE)]
     for v in ["gdp", "inf"]:
         for h in vl.H_REPORT:
             for sample in ["all", "excovid"]:

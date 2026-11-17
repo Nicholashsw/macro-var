@@ -127,7 +127,7 @@ const DATA = __PAYLOAD__;
 const TL = {gdp:"GDP growth", inf:"Core inflation", stance:"Policy stance", fx:"Broad dollar"};
 const SHOCKSYM = {oil:"oil", inv:"inv", wealth:"nw", fiscal:"gov"};
 const TREATL = {raw:"raw", gdp_resid:"gdp purge", full_resid:"full purge", none:""};
-const state = {target:"gdp", h:1, path:"uncond", sample:"all", rule:"all", treat:"all",
+const state = {target:"gdp", h:1, path:"uncond", sample:"all", rule:"bic", treat:"all",
                validOnly:true, sortKey:"rmse", selected:null};
 
 document.getElementById("meta").textContent =

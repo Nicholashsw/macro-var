@@ -8,7 +8,9 @@ Pipeline:
        of stationary transforms (1990Q1 onward).
     2. Enumerate specs: endogenous sets (core + up to two add-ons), exogenous
        shock subsets, shock treatments (raw, GDP-purged, fully purged), and
-       lag orders selected by AIC, BIC and HQIC on the initial training window.
+       lag orders selected on the initial training window (once, p in 1..4).
+       BIC is the main lag rule and all headline results use it; AIC and HQIC
+       are run as robustness checks and reported separately.
     3. Expanding-window walk-forward forecasts at h = 1..8 under two exogenous
        paths: unconditional (shocks at training mean) and realized.
     4. Metrics per target: RMSE, MAE, out-of-sample R2 vs an AR benchmark,
@@ -32,11 +34,13 @@ ENDOG_CORE = ["gdp", "inf", "stance"]
 ENDOG_ADDONS = ["fx", "wage", "emp", "spread", "permits"]
 SHOCKS = ["oil", "inv", "wealth", "fiscal"]
 TREATMENTS = ["raw", "gdp_resid", "full_resid"]
-LAG_RULES = ["aic", "bic", "hqic"]
+LAG_RULES = ["aic", "bic", "hqic"]   # all three are run; MAIN_RULE gives the headline results
+MAIN_RULE = "bic"                   # parsimony on ~140 quarters; aic and hqic are robustness checks
 P_GRID = [1, 2, 3, 4]
 XLAGS = 2               # shock enters with lags 0 and 1
 H_MAX = 8
 H_REPORT = [1, 4, 8]
+SAMPLE_END = "2026Q1"  # last quarter of the panel; fixed so later FRED releases do not extend the sample
 TRAIN_END = "2009Q4"    # last quarter of the initial training window
 COVID_DUMMIES = ["2020Q2", "2020Q3"]
 COVID_EVAL_EXCL = ("2020-01-01", "2021-03-31")  # target dates dropped in ex-COVID metrics
@@ -126,7 +130,7 @@ def build_panel(data_dir=DATA_DIR):
         "wealth": _dlog(nw / cpi),
         "fiscal": _dlog(gov),
     })
-    df = df.loc["1990-01-01":].dropna()
+    df = df.loc["1990-01-01":pd.Period(SAMPLE_END, freq="Q").to_timestamp()].dropna()
     for q in COVID_DUMMIES:
         ts = pd.Period(q, freq="Q").to_timestamp()
         df[f"d{q}"] = (df.index == ts).astype(float)

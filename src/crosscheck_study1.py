@@ -22,6 +22,11 @@ Part 2 extends it:
 
     python src/crosscheck_study1.py
 
+Lag rule (Study 1): BIC is the main rule. Each VAR/VARX picks its lag by BIC, up to 4,
+inside every expanding training window. The model-class comparison (phase 2) fixes P = 2,
+the lag BIC picks for the winner. AIC and HQIC are robustness checks only: the full-sample
+criteria for all four are in results/crosscheck/lag_criteria.csv.
+
 Reads fred_data/ (fetches anything missing, same endpoint as reproduce.py) and
 writes to outputs/crosscheck/. The committed copy lives in results/crosscheck/.
 """

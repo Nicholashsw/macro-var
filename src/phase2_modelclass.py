@@ -31,7 +31,7 @@ ROOT = Path(os.environ.get("REPRO_ROOT", Path(__file__).resolve().parent.parent)
 DATA = ROOT / "fred_data"; DATA.mkdir(parents=True, exist_ok=True)
 OUT = ROOT / "outputs"; OUT.mkdir(parents=True, exist_ok=True)
 FIG = OUT / "figs"; FIG.mkdir(parents=True, exist_ok=True)
-P = 2  # VAR lag order, fixed at Phase-1-selected value for every model class
+P = 2  # VAR lag order, fixed at the BIC-selected Phase-1 value for every model class
 
 # ---------- design / estimator helpers (importable without running) ----------
 def build_design(endog, exog, p):

@@ -15,7 +15,8 @@
 #   Subsets: none, singles, pairs, all four.
 # - Shock treatments: raw, purged of contemporaneous GDP, purged of all endogenous
 #   variables and one lag. Purge coefficients are re-fit on each training window.
-# - Lag order chosen by AIC, BIC and HQIC on the initial training window, p in 1..4.
+# - Lag order chosen once on the initial training window, p in 1..4. BIC is the main
+#   rule and the headline results use it; AIC and HQIC are robustness checks.
 # - Expanding-window walk-forward from 2009Q4, horizons 1, 4, 8. Two exogenous
 #   paths at forecast time: shocks at training mean (unconditional) and realized.
 # - Metrics: RMSE, MAE, out-of-sample R2 against an AR(BIC) benchmark,

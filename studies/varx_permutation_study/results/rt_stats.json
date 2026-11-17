@@ -2,67 +2,67 @@
  "gdp": {
   "1": {
    "all": {
-    "var_final": 6.741,
-    "var_rt": 7.098,
-    "all4_final": 5.659,
-    "all4_rt": 5.972,
-    "adv_final_pct": 16.1,
-    "adv_rt_pct": 15.9,
-    "all4_r2_rt": 0.419,
+    "var_final": 6.768,
+    "var_rt": 7.083,
+    "all4_final": 5.647,
+    "all4_rt": 5.963,
+    "adv_final_pct": 16.6,
+    "adv_rt_pct": 15.8,
+    "all4_r2_rt": 0.42,
     "n": 60
    },
    "excovid": {
-    "var_final": 1.898,
-    "var_rt": 1.934,
-    "all4_final": 1.744,
-    "all4_rt": 1.779,
-    "adv_final_pct": 8.1,
-    "adv_rt_pct": 8.0,
-    "all4_r2_rt": 0.114,
+    "var_final": 1.838,
+    "var_rt": 1.877,
+    "all4_final": 1.7,
+    "all4_rt": 1.731,
+    "adv_final_pct": 7.5,
+    "adv_rt_pct": 7.8,
+    "all4_r2_rt": 0.131,
     "n": 55
    }
   },
   "4": {
    "all": {
-    "var_final": 6.066,
+    "var_final": 6.071,
     "var_rt": 6.204,
-    "all4_final": 6.031,
-    "all4_rt": 6.18,
-    "adv_final_pct": 0.6,
-    "adv_rt_pct": 0.4,
-    "all4_r2_rt": 0.009,
+    "all4_final": 6.026,
+    "all4_rt": 6.174,
+    "adv_final_pct": 0.7,
+    "adv_rt_pct": 0.5,
+    "all4_r2_rt": 0.01,
     "n": 59
    },
    "excovid": {
-    "var_final": 1.939,
-    "var_rt": 2.093,
-    "all4_final": 1.754,
-    "all4_rt": 1.778,
-    "adv_final_pct": 9.5,
-    "adv_rt_pct": 15.1,
-    "all4_r2_rt": 0.149,
+    "var_final": 1.937,
+    "var_rt": 2.074,
+    "all4_final": 1.718,
+    "all4_rt": 1.736,
+    "adv_final_pct": 11.3,
+    "adv_rt_pct": 16.3,
+    "all4_r2_rt": 0.171,
     "n": 54
    }
   },
   "8": {
    "all": {
-    "var_final": 6.174,
-    "var_rt": 6.236,
-    "all4_final": 6.183,
-    "all4_rt": 6.342,
+    "var_final": 6.173,
+    "var_rt": 6.232,
+    "all4_final": 6.177,
+    "all4_rt": 6.337,
     "adv_final_pct": -0.1,
     "adv_rt_pct": -1.7,
     "all4_r2_rt": 0.0,
     "n": 55
    },
    "excovid": {
-    "var_final": 1.686,
-    "var_rt": 1.725,
-    "all4_final": 1.671,
-    "all4_rt": 1.698,
-    "adv_final_pct": 0.9,
-    "adv_rt_pct": 1.6,
-    "all4_r2_rt": 0.005,
+    "var_final": 1.663,
+    "var_rt": 1.694,
+    "all4_final": 1.631,
+    "all4_rt": 1.657,
+    "adv_final_pct": 1.9,
+    "adv_rt_pct": 2.2,
+    "all4_r2_rt": 0.01,
     "n": 51
    }
   }
@@ -70,67 +70,67 @@
  "inf": {
   "1": {
    "all": {
-    "var_final": 1.028,
-    "var_rt": 1.105,
-    "all4_final": 0.999,
-    "all4_rt": 1.151,
-    "adv_final_pct": 2.8,
-    "adv_rt_pct": -4.2,
-    "all4_r2_rt": -0.4,
+    "var_final": 1.001,
+    "var_rt": 1.083,
+    "all4_final": 0.975,
+    "all4_rt": 1.122,
+    "adv_final_pct": 2.6,
+    "adv_rt_pct": -3.6,
+    "all4_r2_rt": -0.397,
     "n": 60
    },
    "excovid": {
-    "var_final": 0.757,
-    "var_rt": 0.848,
-    "all4_final": 0.772,
-    "all4_rt": 0.884,
-    "adv_final_pct": -2.0,
+    "var_final": 0.728,
+    "var_rt": 0.825,
+    "all4_final": 0.749,
+    "all4_rt": 0.86,
+    "adv_final_pct": -2.9,
     "adv_rt_pct": -4.2,
-    "all4_r2_rt": 0.008,
+    "all4_r2_rt": 0.014,
     "n": 55
    }
   },
   "4": {
    "all": {
-    "var_final": 1.23,
-    "var_rt": 1.262,
-    "all4_final": 1.244,
-    "all4_rt": 1.338,
-    "adv_final_pct": -1.1,
-    "adv_rt_pct": -6.0,
-    "all4_r2_rt": -0.118,
+    "var_final": 1.215,
+    "var_rt": 1.235,
+    "all4_final": 1.229,
+    "all4_rt": 1.308,
+    "adv_final_pct": -1.2,
+    "adv_rt_pct": -5.9,
+    "all4_r2_rt": -0.103,
     "n": 59
    },
    "excovid": {
-    "var_final": 1.199,
-    "var_rt": 1.239,
-    "all4_final": 1.213,
-    "all4_rt": 1.323,
-    "adv_final_pct": -1.2,
-    "adv_rt_pct": -6.8,
-    "all4_r2_rt": -0.122,
+    "var_final": 1.19,
+    "var_rt": 1.217,
+    "all4_final": 1.205,
+    "all4_rt": 1.298,
+    "adv_final_pct": -1.3,
+    "adv_rt_pct": -6.7,
+    "all4_r2_rt": -0.106,
     "n": 54
    }
   },
   "8": {
    "all": {
-    "var_final": 1.445,
-    "var_rt": 1.457,
-    "all4_final": 1.452,
-    "all4_rt": 1.499,
-    "adv_final_pct": -0.5,
+    "var_final": 1.424,
+    "var_rt": 1.431,
+    "all4_final": 1.433,
+    "all4_rt": 1.473,
+    "adv_final_pct": -0.6,
     "adv_rt_pct": -2.9,
-    "all4_r2_rt": -0.071,
+    "all4_r2_rt": -0.061,
     "n": 55
    },
    "excovid": {
-    "var_final": 1.443,
-    "var_rt": 1.441,
-    "all4_final": 1.449,
-    "all4_rt": 1.486,
-    "adv_final_pct": -0.4,
-    "adv_rt_pct": -3.1,
-    "all4_r2_rt": -0.076,
+    "var_final": 1.425,
+    "var_rt": 1.419,
+    "all4_final": 1.434,
+    "all4_rt": 1.464,
+    "adv_final_pct": -0.6,
+    "adv_rt_pct": -3.2,
+    "all4_r2_rt": -0.064,
     "n": 51
    }
   }

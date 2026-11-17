@@ -18,7 +18,8 @@ GRAY = "#8a97a8"
 
 df = vl.build_panel()
 res = pd.read_parquet("results.parquet")
-V = res[res.valid]
+VA = res[res.valid]                       # all lag rules (robustness)
+V = VA[VA.lag_rule == vl.MAIN_RULE]       # BIC: the main lag rule, used for every headline figure and statistic
 
 # F1 data panel
 fig, axes = plt.subplots(4, 3, figsize=(9, 7.5), sharex=True)
@@ -59,8 +60,8 @@ fig.tight_layout()
 fig.savefig("fig3_treatment.png", bbox_inches="tight")
 plt.close(fig)
 
-# F4 lag rule medians heat-style table
-s = V[(V.path == "uncond") & (V["sample"] == "all")]
+# F4 lag rule medians heat-style table (robustness: all three rules)
+s = VA[(VA.path == "uncond") & (VA["sample"] == "all")]
 piv = s.groupby(["target", "h", "lag_rule"]).rmse.median().unstack()
 fig, ax = plt.subplots(figsize=(4.6, 3.2))
 norm = piv.div(piv.min(axis=1), axis=0)
@@ -130,7 +131,7 @@ for t in ["gdp", "inf", "stance", "fx"]:
                          for k in ["endog", "shocks", "treatment", "lag_rule", "p", "rmse", "r2_oos", "dm_p"]},
                 "noshock_best_rmse": round(float(ns), 3),
             }
-s = V[(V.path == "uncond") & (V["sample"] == "all")]
+s = VA[(VA.path == "uncond") & (VA["sample"] == "all")]
 stats["lagrule_median"] = {f"{t}_{h}": {r: round(float(x), 3) for r, x in
                             s[(s.target == t) & (s.h == h)].groupby("lag_rule").rmse.median().items()}
                            for t in ["gdp", "inf", "stance", "fx"] for h in [1, 4]}
@@ -150,9 +151,19 @@ stats["shockcount_gdp_h1"] = {int(k): {"median": round(float(v["median"]), 3), "
                               for k, v in s4.groupby("nshocks").rmse.agg(["median", "min"]).iterrows()}
 stats["counts"] = {"cells": 544, "spec_rows": int(res.spec_id.nunique()), "unique_models": int(res.model_id.nunique()),
                    "valid_share": round(float(res.drop_duplicates("spec_id").valid.mean()), 3),
-                   "n_origins": 65, "result_rows": int(len(res))}
+                   "n_origins": len(df) - 1 - df.index.get_loc(pd.Period(vl.TRAIN_END, freq="Q").to_timestamp()),
+                   "n_obs": len(df), "sample_start": str(df.index[0].date()), "sample_end": str(df.index[-1].date()), "result_rows": int(len(res))}
 dmsig = V[(V.path == "uncond") & (V["sample"] == "all") & V.dm_p.notna()]
 stats["dm_sig_share_5pct"] = round(float((dmsig.dm_p < 0.05).mean()), 4)
+dmall = VA[(VA.path == "uncond") & (VA["sample"] == "all") & VA.dm_p.notna()]
+stats["dm_sig_share_5pct_by_rule"] = {r: round(float((g.dm_p < 0.05).mean()), 4) for r, g in dmall.groupby("lag_rule")}
+# robustness: best spec per target/horizon under each lag rule
+stats["best_by_rule"] = {}
+for t in ["gdp", "inf", "stance", "fx"]:
+    for h in [1, 4, 8]:
+        for r in vl.LAG_RULES:
+            s = VA[(VA.target == t) & (VA.h == h) & (VA.path == "uncond") & (VA["sample"] == "all") & (VA.lag_rule == r)]
+            stats["best_by_rule"][f"{t}_{h}_{r}"] = round(float(s.rmse.min()), 3)
 with open("paper_stats.json", "w") as f:
     json.dump(stats, f, indent=1)
 print("figures + stats done")

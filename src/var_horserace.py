@@ -20,6 +20,11 @@ Four specifications share this runner (choose with --spec):
 
     python src/var_horserace.py --spec augmented
 
+Lag rule (Study 1): BIC is the main rule. Each VAR/VARX picks its lag by BIC, up to 4,
+inside every expanding training window. The model-class comparison (phase 2) fixes P = 2,
+the lag BIC picks for the winner. AIC and HQIC are robustness checks only: the full-sample
+criteria for all four are in results/crosscheck/lag_criteria.csv.
+
 Data: FRED public no-key CSV endpoint (fetched separately into ./fred_data).
 For research / education. Not investment advice.
 """
