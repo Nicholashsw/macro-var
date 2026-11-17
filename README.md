@@ -95,14 +95,6 @@ pure VAR.
 - The shock models' 12% gain at h=1 is mostly COVID, and identified shocks add nothing over
   growth-rate proxies.
 
-## What I learned
-
-<!-- TODO Nick: three bullets in your own words. -->
-
-- 
-- 
-- 
-
 ## How to run
 
 ```
