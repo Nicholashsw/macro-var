@@ -18,10 +18,18 @@ Nicholas Hong, Nanyang Technological University
   shock, added as inputs) through an expanding walk-forward, including a replication on data as
   it was first published.
 
+Lag selection. BIC is the main lag rule in both studies and every headline number uses it; AIC
+and HQIC are robustness checks. Study 1 picks the VAR lag by BIC, up to 4, inside every training
+window, and fixes the lag at 2 for the model-class comparison. The VARX study picks the lag once on
+the initial training window (to 2009Q4), over 1 to 4 lags, and runs AIC and HQIC on the same grid as
+robustness rows.
+
 | Study | Paper |
 |---|---|
 | Disciplined specification search and model-class evaluation (repository root) | [`papers/01_var_selection_horserace.pdf`](papers/01_var_selection_horserace.pdf) |
 | A permutation study of VARX forecasting models (`studies/varx_permutation_study/`) | [`studies/varx_permutation_study/paper/varx_permutation_study.pdf`](studies/varx_permutation_study/paper/varx_permutation_study.pdf) |
+
+A merged source covering both studies is in `papers/macro_var/main.tex`.
 
 ## Data
 
@@ -68,14 +76,14 @@ winner scores 0.9657 at h=1. The text uses the 54 origins common to both horizon
 Look-ahead in a standard filter. The Hodrick-Prescott (HP) filter splits a series into trend and
 cycle. Run once on the full sample, it uses future data. For the policy rate, the two-sided cycle
 differs from the real-time one by 0.86 points on average, 80% of the cycle's own standard
-deviation. Over the last eight quarters the gap is 65.8%, a figure that moves by tens of points
-with the quarter the sample ends in (`src/demo_hp_lookahead.py` gives 24% to 62% for end quarters
-from 2025Q2 to 2026Q2). Year-over-year transforms fail every whiteness test.
+deviation. Over the last eight quarters the gap is 65.8%, a figure that depends on the quarter the
+sample ends in. Year-over-year transforms fail every whiteness test.
 
-VARX permutation study. 1,632 specifications (544 cells under three lag rules) and 1,014 unique
-models in an expanding walk-forward from 2009Q4. Exogenous shocks buy a ~12% GDP RMSE gain at h=1
-that is mostly COVID and mostly noise (4.0% of specs beat the core at the 5% level, what chance
-delivers). The gain survives ALFRED real-time vintages. Externally identified shocks (Kaenzig oil,
+VARX permutation study. 1,632 specifications (544 cells under three lag rules, BIC the main rule)
+and 1,014 unique models in an expanding walk-forward from 2009Q4. Exogenous shocks buy a 12% GDP
+RMSE gain at h=1 that is mostly COVID and mostly noise (3.8% of BIC specs beat the core at the 5%
+level, what chance delivers). The gain survives ALFRED real-time vintages (16.6% final, 15.8%
+real-time). Externally identified shocks (Kaenzig oil,
 Bauer-Swanson FOMC) do not beat cheap growth-rate proxies. In the predictive density the shock
 model is overconfident until future-shock risk is priced, after which it is no sharper than the
 pure VAR.
@@ -94,7 +102,8 @@ pure VAR.
   cointegration with an intercept (case 3) and one vector with no deterministic terms, so the
   no-VECM choice depends on the trend case.
 - The shock models' 12% gain at h=1 is mostly COVID, and identified shocks add nothing over
-  growth-rate proxies.
+  growth-rate proxies. AIC, a robustness rule, gives the persistent policy-stance variable a lower
+  h=8 RMSE than BIC does (1.62 against 2.01), and does not change the GDP result.
 
 ## How to run
 
@@ -109,25 +118,19 @@ directory (override the root with `REPRO_ROOT`). Re-runs write to `fred_data/`, 
 `outputs/`, all gitignored, so nothing regenerated overwrites the committed tables in `results/`,
 the charts in `figs/`, or the typeset figures in `papers/var_selection_horserace/figs/`.
 `src/reproduce.py` puts its three paper figures in `outputs/figs/`. The permutation study's
-`run_study.py` reproduces the full walk-forward in well under a minute; its extensions (real-time,
-identified shocks, combination, density, Bayesian coverage) run in seconds against cached data.
+`run_study.py` reproduces the full walk-forward; its extensions (real-time,
+identified shocks, combination, density, Bayesian coverage) run against cached data.
 A self-contained interactive console is in `dashboard/dashboard.html`. See
 `studies/varx_permutation_study/README.md`.
 
-Reproduction record. Re-executed on 2026-08-21 against a fresh FRED pull: the specification
-search (eligible winner `CORE+OIL(x)`, and the same greedy path and gate rejections above) and the
-model-class table reproduced. The HP revision statistic moved from 65.8% to 66.3% and the
-Johansen trace in the second decimal. The HP move comes from where the sample ends: the federal
-funds rate is not revised, the fresh pull had one more month of data, and the statistic is about
-five points lower when the sample ends one quarter earlier. A rerun on 17 November 2026 from a
-later cache gives the same search result and differs from the model-class table in the fourth
-decimal on the wide models. `results/reproduce_results.json` records the library versions of the
+Reproduction record. `results/reproduce_results.json` records the library versions of the
 reference run (numpy 2.4.4, pandas 3.0.2, statsmodels 0.14.6, scikit-learn 1.8.0, arch 8.0.0);
 those exact pins are in `requirements-reference.txt`, so `pip install -r
 requirements-reference.txt` rebuilds the reference environment. `requirements.txt` is the loose
-everyday set. The permutation study was re-executed end to end on 2026-08-21 (1,014 models, 38 s;
-all 31 paper statistics identical) and again on 2026-08-23 (1,014 models, 63,918 result rows,
-36 s).
+everyday set. The permutation study was re-executed end to end on a fresh FRED pull (1,014 models,
+63,918 result rows) with the panel fixed to end in 2026Q1, and its results files, figures and
+dashboard were regenerated from that run. FRED revises national-accounts series, so a later pull
+moves the permutation-study RMSEs in the second or third decimal.
 
 ### Cross-check
 
@@ -136,9 +139,8 @@ anchor, extended with a Minnesota BVAR in the same loop, unit roots, Johansen un
 cases, full residual diagnostics, IRFs, FEVD, historical decomposition and a GLP-style BVAR.
 Outputs are in `results/crosscheck/`. Scored on the paper's window it returns the published
 numbers to four decimals: 0.9679 / 0.8786 for `CORE+OIL(x)` and 1.0431 / 0.9318 for `CORE`, with
-identical Clark-West statistics. `reproduce.py` scores both horizons on the 54 common origins;
-`reproduce_results.json` used to report 57 for h=1 and now reports 54. On all 57 h=1 origins the
-winner scores 0.9656. The Minnesota BVAR uses lambda 0.1 and a prior mean of 1 on the policy
+identical Clark-West statistics. `reproduce.py` scores both horizons on the 54 common origins. On all
+57 h=1 origins the winner scores 0.9656. The Minnesota BVAR uses lambda 0.1 and a prior mean of 1 on the policy
 rate's own lag. `docs/eviews_spotchecks.md` lists EViews commands, with expected values, for
 checking the same model in a second package.
 

@@ -16,4 +16,4 @@ Metrics: relative-RMSE vs benchmark with Clark-West, Diebold-Mariano, and Model 
 
 The phase-2 files and `figs/phase2_heatmap.png` come from a run on 127 quarters (1994Q2 to 2025Q4).
 `reproduce_results.json` uses 128 quarters (to 2026Q1), so its model-class figures differ from the
-phase-2 table in the second or third decimal (Ridge small: 0.8768 there, 0.8792 here).
+phase-2 table in the second or third decimal (Ridge small: 0.8792 there, 0.8768 here).
