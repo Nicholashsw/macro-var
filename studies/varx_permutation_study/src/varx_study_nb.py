@@ -137,18 +137,19 @@ else:
     res.to_parquet("results.parquet")
     print("ran study:", res.shape)
 V = res[res.valid]
+VM = V[V.lag_rule == vl.MAIN_RULE]   # headline rows: BIC; section 7 compares all three rules
 print(f"validity gate keeps {res.drop_duplicates('spec_id').valid.mean():.1%} of specs")
 
 # %% [markdown]
 # ## 4. Leaderboards
 #
-# Per-target leaderboards, unconditional shock path, full evaluation window,
-# validity-gated. DM p-values test squared-error loss against the core
+# Per-target leaderboards, BIC lag rule (the main rule), unconditional shock path,
+# full evaluation window, validity-gated. DM p-values test squared-error loss against the core
 # three-variable VAR under the same lag rule.
 
 # %%
 def leaderboard(target, h, path="uncond", sample="all", n=8):
-    s = V[(V.target == target) & (V.h == h) & (V.path == path) & (V["sample"] == sample)]
+    s = VM[(VM.target == target) & (VM.h == h) & (VM.path == path) & (VM["sample"] == sample)]
     cols = ["addons", "shocks", "treatment", "lag_rule", "p", "rmse", "mae", "r2_oos", "dm_p"]
     out = s.nsmallest(n, "rmse")[cols].reset_index(drop=True)
     return out.round(3)
@@ -165,7 +166,7 @@ for t in ["gdp", "inf", "stance", "fx"]:
 # %% [markdown]
 # ## 5. Does adding shocks help at all?
 #
-# Best shocked spec against best pure VAR, per target and horizon. The follow-up
+# Best shocked spec against best pure VAR, per target and horizon, BIC lag rule. The follow-up
 # question, whether the improvement is statistically distinguishable, is answered
 # by the DM column above: it almost never is.
 
@@ -173,7 +174,7 @@ for t in ["gdp", "inf", "stance", "fx"]:
 rows = []
 for t in ["gdp", "inf", "stance", "fx"]:
     for h in [1, 4, 8]:
-        s = V[(V.target == t) & (V.h == h) & (V.path == "uncond") & (V["sample"] == "all")]
+        s = VM[(VM.target == t) & (VM.h == h) & (VM.path == "uncond") & (VM["sample"] == "all")]
         rows.append({"target": t, "h": h,
                      "pure_var_best": s[s.shocks == "none"].rmse.min(),
                      "shocked_best": s[s.shocks != "none"].rmse.min()})
@@ -181,7 +182,7 @@ tab = pd.DataFrame(rows)
 tab["gain_pct"] = 100 * (1 - tab.shocked_best / tab.pure_var_best)
 print(tab.round(3).to_string(index=False))
 
-s = V[(V.target == "gdp") & (V.h == 1) & (V.path == "uncond") & (V["sample"] == "all")].copy()
+s = VM[(VM.target == "gdp") & (VM.h == 1) & (VM.path == "uncond") & (VM["sample"] == "all")].copy()
 s["nshocks"] = s.shocks.apply(lambda x: 0 if x == "none" else len(x.split("+")))
 fig, ax = plt.subplots(figsize=(5, 3))
 ax.boxplot([s[s.nshocks == k].rmse.values for k in [0, 1, 2, 4]],
@@ -228,7 +229,7 @@ plt.show()
 # %% [markdown]
 # ## 7. Lag rules
 #
-# AIC against BIC against HQIC, median RMSE across valid specs.
+# Robustness: AIC against BIC against HQIC, median RMSE across valid specs.
 
 # %%
 s3 = V[(V.path == "uncond") & (V["sample"] == "all")]
@@ -238,10 +239,10 @@ print("\nlag orders chosen:")
 print(sp.groupby(["lag_rule", "p"]).size().unstack(fill_value=0).to_string())
 
 # %% [markdown]
-# BIC wins or ties for GDP, inflation and the dollar. AIC wins for the stance,
-# where the extra persistence of a p=3 or p=4 system pays off. HQIC sits almost
-# exactly at p=2 everywhere and is a reasonable single default. The usual warning
-# that AIC overfits out of sample holds for three of the four targets.
+# BIC gives the lowest median RMSE in 11 of the 12 target and horizon cells. AIC is
+# lower only for the stance at h=1 (0.550 against 0.554). HQIC picks p=2 in almost
+# every spec, BIC picks p=1 or p=2, and AIC goes up to p=4.
+# BIC is the main rule in this study; AIC and HQIC are the robustness checks.
 
 # %% [markdown]
 # ## 8. The value of knowing the shock path
@@ -265,8 +266,8 @@ print(s4.groupby(["h", "treatment", "path"]).rmse.median().unstack().round(3).to
 # ## 9. Best GDP model against actuals
 
 # %%
-best = V[(V.target == "gdp") & (V.h == 1) & (V.path == "uncond")
-         & (V["sample"] == "all")].nsmallest(1, "rmse").iloc[0]
+best = VM[(VM.target == "gdp") & (VM.h == 1) & (VM.path == "uncond")
+         & (VM["sample"] == "all")].nsmallest(1, "rmse").iloc[0]
 print(best[["endog", "shocks", "treatment", "lag_rule", "p", "rmse", "r2_oos", "dm_p"]].to_string())
 
 endog = best.endog.split("+")
@@ -307,21 +308,21 @@ print(f"RMSE ex COVID: {np.sqrt(np.mean((fc[mask]-act[mask])**2)):.3f}")
 #    Most of the headline gain concentrates in the COVID reversal quarters; the
 #    ex-COVID gain is real but modest.
 # 2. Almost nothing survives a Diebold-Mariano test against the plain core VAR.
-#    About 4 percent of specs clear 5 percent significance, which is what noise
+#    About 3.8 percent of specs clear 5 percent significance, which is what noise
 #    alone would deliver. Rank models, but do not oversell the ranking.
 # 3. Do not purge shocks because it feels rigorous. Purging costs forecast accuracy
 #    for GDP, inflation and the dollar. It is the right tool when the question is
 #    structural, and the wrong default when the question is predictive.
-# 4. Do not use AIC as the house lag rule. It only pays for the persistent stance
-#    variable. BIC or HQIC at p=2 is the robust default on this data.
+# 4. BIC is the main lag rule. AIC gives a lower median RMSE only for the stance at
+#    h=1, and its best stance spec at h=8 (RMSE 1.62 against 2.01 under BIC) is a
+#    robustness result, not the headline.
 # 5. Do not read the leaderboard shock combination as stable truth. With 65
 #    evaluation points the top ten specs are statistically interchangeable, and
 #    the honest summary is that oil plus wealth plus a real activity shock in raw
 #    form spans the useful information.
 #
-# Single highest-value next step: wire the winning spec into a real-time vintage
-# exercise with ALFRED data, because the end-of-quarter information set assumed
-# here flatters every shock-augmented model.
+# The end-of-quarter information set assumed here flatters every shock-augmented
+# model; the real-time replication on ALFRED vintages is in `src/run_realtime.py`.
 
 # %% [markdown]
 # ---
